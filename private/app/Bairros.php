@@ -100,6 +100,25 @@ class Bairros
         );
     }
 
+    public static function buscar(int $id): ?array
+    {
+        return Db::primeiro('SELECT * FROM bairros WHERE id = ?', [$id]);
+    }
+
+    /** Contatos que têm este bairro como endereço. */
+    public static function contatosDoBairro(int $id): array
+    {
+        $bairro = self::buscar($id);
+        if (!$bairro) {
+            return [];
+        }
+        return Db::todos(
+            'SELECT id, nome, email, telefone, ativo, opt_out
+               FROM contatos WHERE bairro = ? ORDER BY nome',
+            [$bairro['nome']]
+        );
+    }
+
     public static function excluir(int $id): void
     {
         $bairro = Db::primeiro('SELECT * FROM bairros WHERE id = ?', [$id]);

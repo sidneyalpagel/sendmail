@@ -37,7 +37,7 @@
         <tbody>
         <?php foreach ($bairros as $b): ?>
             <tr>
-                <td><?= e($b['nome']) ?></td>
+                <td><a href="?p=bairro_contatos&amp;id=<?= (int) $b['id'] ?>"><?= e($b['nome']) ?></a></td>
                 <td class="dado"><?= (int) $b['contatos'] ?></td>
                 <td class="dado"><?= (int) $b['aptos'] ?></td>
                 <td>
@@ -52,15 +52,19 @@
                                    style="width:180px">
                             <button class="botao botao--neutro botao--pequeno">Renomear</button>
                         </form>
-                        <?php if ((int) $b['contatos'] === 0): ?>
-                            <form method="post" onsubmit="return confirm('Excluir o bairro <?= e($b['nome']) ?>?')">
-                                <input type="hidden" name="csrf" value="<?= token() ?>">
-                                <input type="hidden" name="acao" value="bairro_excluir">
-                                <input type="hidden" name="id" value="<?= (int) $b['id'] ?>">
-                                <input type="hidden" name="voltar" value="?p=bairros">
-                                <button class="botao botao--perigo botao--pequeno">Excluir</button>
-                            </form>
-                        <?php endif; ?>
+                        <form method="post"
+                              <?php if ((int) $b['contatos'] === 0): ?>
+                                  onsubmit="return confirm('Excluir o bairro <?= e($b['nome']) ?>?')"
+                              <?php endif; ?>>
+                            <input type="hidden" name="csrf" value="<?= token() ?>">
+                            <input type="hidden" name="acao" value="bairro_excluir">
+                            <input type="hidden" name="id" value="<?= (int) $b['id'] ?>">
+                            <input type="hidden" name="voltar" value="?p=bairros">
+                            <button class="botao botao--perigo botao--pequeno"
+                                    <?php if ((int) $b['contatos'] > 0): ?>
+                                        title="Há contatos neste bairro — abre a lista deles"
+                                    <?php endif; ?>>Excluir</button>
+                        </form>
                     </div>
                 </td>
             </tr>

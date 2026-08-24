@@ -97,8 +97,20 @@ if ($metodo === 'POST') {
                 irPara('?p=bairros');
 
             case 'bairro_excluir':
-                Bairros::excluir((int) $_POST['id']);
-                aviso('Bairro excluído.');
+                $id = (int) $_POST['id'];
+                $bairro = Bairros::buscar($id);
+                if (!$bairro) {
+                    throw new RuntimeException('Bairro não encontrado.');
+                }
+                $moradores = count(Bairros::contatosDoBairro($id));
+                if ($moradores > 0) {
+                    aviso("O bairro {$bairro['nome']} não pode ser excluído: há {$moradores} "
+                        . ($moradores === 1 ? 'contato cadastrado' : 'contatos cadastrados')
+                        . ' nele. Veja a lista abaixo e mova-os antes.', 'erro');
+                    irPara('?p=bairro_contatos&id=' . $id);
+                }
+                Bairros::excluir($id);
+                aviso('Bairro ' . $bairro['nome'] . ' excluído.');
                 irPara('?p=bairros');
 
             // ---------------------------------------------------- modelos
@@ -350,6 +362,17 @@ switch ($pagina) {
 
     case 'bairros':
         incluirView('bairros', ['bairros' => Bairros::listar()]);
+        break;
+
+    case 'bairro_contatos':
+        $id = (int) ($_GET['id'] ?? 0);
+        $bairro = Bairros::buscar($id);
+        if (!$bairro) {
+            aviso('Bairro não encontrado.', 'erro');
+            irPara('?p=bairros');
+        }
+        $moradores = Bairros::contatosDoBairro($id);
+        incluirView('bairro_contatos', compact('bairro', 'moradores'));
         break;
 
     case 'importar':

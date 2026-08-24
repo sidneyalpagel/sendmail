@@ -1,5 +1,15 @@
 # Histórico de versões
 
+## 1.7.2 — 24/08/2026
+
+Exclusão de bairro com aviso detalhado.
+
+- Tentar excluir um bairro que tem contatos abre uma tela com a lista de
+  quem mora nele — nome, e-mail, situação e atalho para editar cada um — em
+  vez de só recusar com uma mensagem. Na mesma tela dá para renomear/fundir
+  o bairro (movendo todos de uma vez) e, esvaziado, excluí-lo ali mesmo.
+- O nome do bairro na listagem vira link para essa tela.
+
 ## 1.7.1 — 24/08/2026
 
 Conta de envio pela interface.
