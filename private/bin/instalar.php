@@ -16,14 +16,28 @@ require_once dirname(__DIR__) . '/app/bootstrap.php';
 
 function perguntar(string $rotulo, bool $oculto = false): string
 {
+    // O eco só é desligado quando dá: em servidores endurecidos (Hestia, por
+    // exemplo) shell_exec costuma estar na lista de funções desabilitadas.
+    $podeOcultar = $oculto
+        && stream_isatty(STDIN)
+        && DIRECTORY_SEPARATOR !== '\\'
+        && function_exists('shell_exec')
+        && !in_array('shell_exec', array_map('trim', explode(',', (string) ini_get('disable_functions'))), true);
+
+    if ($oculto && !$podeOcultar) {
+        echo '(a senha ficará visível ao digitar) ';
+    }
+
     echo $rotulo;
-    if ($oculto && stream_isatty(STDIN) && DIRECTORY_SEPARATOR !== '\\') {
+
+    if ($podeOcultar) {
         shell_exec('stty -echo');
         $valor = trim((string) fgets(STDIN));
         shell_exec('stty echo');
         echo PHP_EOL;
         return $valor;
     }
+
     return trim((string) fgets(STDIN));
 }
 

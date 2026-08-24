@@ -1,5 +1,14 @@
 # Histórico de versões
 
+## 1.2.1 — 24/08/2026
+
+Correção.
+
+- O instalador não roda mais `shell_exec` sem verificar se a função existe e se
+  está habilitada. O HestiaCP a mantém em `disable_functions` por padrão, e o
+  script morria com erro fatal ao pedir a senha do primeiro operador. Quando não
+  é possível ocultar a digitação, avisa e segue com a senha visível.
+
 ## 1.2.0 — 24/08/2026
 
 Descadastro público.
