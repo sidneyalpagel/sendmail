@@ -1,5 +1,18 @@
 # Histórico de versões
 
+## 1.3.0 — 24/08/2026
+
+Robustez.
+
+- O worker recupera itens presos em "enviando". Se um ciclo morria no meio de
+  um envio (queda de energia, processo morto), a linha ficava nesse status
+  para sempre e a campanha nunca concluía. Agora, no início de cada ciclo,
+  essas linhas voltam para a fila contando uma tentativa.
+- Bloqueio temporário do login: dez falhas em quinze minutos, do mesmo IP ou
+  contra o mesmo usuário, suspendem novas tentativas até a janela expirar. O
+  operador bloqueado recebe aviso claro, e o evento fica na auditoria como
+  "login_bloqueado".
+
 ## 1.2.3 — 24/08/2026
 
 Correções no deploy.
