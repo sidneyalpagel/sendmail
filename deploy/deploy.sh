@@ -148,13 +148,23 @@ if [[ -n "${HOST_SSH:-}" ]]; then
     ORIGEM="${REPO/git@github.com:/${HOST_SSH}:}"
 fi
 
+# --force nas tags: se uma tag foi movida no repositório de origem, sem ele o
+# fetch falha inteiro em vez de atualizar.
 if [[ -d "${ESPELHO}/.git" ]]; then
     git -C "$ESPELHO" remote set-url origin "$ORIGEM"
-    git -C "$ESPELHO" fetch --all --tags --prune --quiet || abortar "falha ao buscar do GitHub (confira a chave de deploy)"
+    if ! SAIDA_GIT="$(git -C "$ESPELHO" fetch --all --tags --prune --force 2>&1)"; then
+        erro "falha ao buscar do GitHub:"
+        printf '%s\n' "$SAIDA_GIT" | sed 's/^/      /' >&2
+        abortar "confira a chave de deploy com: ssh -T ${HOST_SSH:-git@github.com}"
+    fi
     ok "repositório atualizado"
 else
     rm -rf "$ESPELHO"
-    git clone --quiet "$ORIGEM" "$ESPELHO" || abortar "falha ao clonar (confira a chave de deploy e a URL)"
+    if ! SAIDA_GIT="$(git clone "$ORIGEM" "$ESPELHO" 2>&1)"; then
+        erro "falha ao clonar:"
+        printf '%s\n' "$SAIDA_GIT" | sed 's/^/      /' >&2
+        abortar "confira a URL do repositório e a chave de deploy"
+    fi
     ok "repositório clonado"
 fi
 
@@ -267,7 +277,20 @@ ok "dono e permissões ajustados"
 echo
 azul "7. Estrutura do banco"
 
-if sudo -u "$USUARIO" "$PHP" "${DESTINO}/private/bin/instalar.php" --tabelas; then
+# Roda como o dono da aplicação. Nem todo servidor tem sudo instalado, e o
+# deploy pode já estar rodando com o usuário certo.
+if [[ "$(id -un)" == "$USUARIO" ]]; then
+    COMO_USUARIO=("$PHP")
+elif command -v sudo >/dev/null 2>&1; then
+    COMO_USUARIO=(sudo -u "$USUARIO" "$PHP")
+elif [[ "$(id -u)" -eq 0 ]] && command -v runuser >/dev/null 2>&1; then
+    COMO_USUARIO=(runuser -u "$USUARIO" -- "$PHP")
+else
+    erro "sem sudo nem runuser; rodando a conferência como $(id -un)"
+    COMO_USUARIO=("$PHP")
+fi
+
+if "${COMO_USUARIO[@]}" "${DESTINO}/private/bin/instalar.php" --tabelas; then
     ok "estrutura conferida"
 else
     erro "a conferência do banco falhou"
