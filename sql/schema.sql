@@ -82,6 +82,7 @@ CREATE TABLE IF NOT EXISTS fila (
     enviado_em   DATETIME      NULL,
     KEY idx_fila_trabalho (status, liberar_em),
     KEY idx_fila_campanha (campanha_id, status),
+    KEY idx_fila_janela (status, enviado_em),
     CONSTRAINT fk_fila_campanha FOREIGN KEY (campanha_id)
         REFERENCES campanhas(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -106,6 +107,7 @@ CREATE TABLE IF NOT EXISTS parametros (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT IGNORE INTO parametros (chave, valor) VALUES
+    ('envios_por_dia',    '1000'),
     ('envios_por_minuto', '20'),
     ('max_tentativas',    '3'),
     ('pausa_global',      '0');

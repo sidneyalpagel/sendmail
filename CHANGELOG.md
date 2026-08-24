@@ -1,5 +1,20 @@
 # Histórico de versões
 
+## 1.1.0 — 24/08/2026
+
+Teto diário de envio.
+
+- Limite de mensagens nas últimas 24 horas, em janela rolante: cada mensagem
+  deixa de contar 24h depois de sair, evitando o pico de meia-noite. Ao atingir
+  o teto a fila pausa e retoma sozinha, sem perder nada.
+- Ajustável pela interface (padrão 1000); `0` desliga o limite.
+- Painel, Ajustes e a tela do envio mostram o consumo da janela, quanto ainda
+  cabe e o horário da próxima vaga — a fila nunca parece travada sem explicação.
+- Índice `idx_fila_janela` para a contagem, criado automaticamente pelo deploy
+  em bases já existentes.
+- A sessão do banco passa a usar o fuso da aplicação. Com o servidor em UTC,
+  todas as datas exibidas ao operador saíam adiantadas.
+
 ## 1.0.1 — 24/08/2026
 
 Deploy a partir do GitHub.

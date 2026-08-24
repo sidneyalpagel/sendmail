@@ -83,6 +83,31 @@ if (!$somenteTabelas && str_contains((string) config('app.chave'), 'GERE_UMA_CHA
 // ---------------------------------------------------------------------
 // 3. Primeiro operador
 // ---------------------------------------------------------------------
+// ---------------------------------------------------------------------
+// Ajustes em bases que já existiam. Cada um confere antes de aplicar,
+// então rodar de novo não causa erro.
+// ---------------------------------------------------------------------
+$indice = Db::valor(
+    'SELECT COUNT(*) FROM information_schema.statistics
+      WHERE table_schema = DATABASE() AND table_name = "fila" AND index_name = "idx_fila_janela"'
+);
+if (!$indice) {
+    Db::pdo()->exec('ALTER TABLE fila ADD KEY idx_fila_janela (status, enviado_em)');
+    echo "Índice idx_fila_janela criado.\n";
+}
+
+foreach ([
+    'envios_por_dia'    => '1000',
+    'envios_por_minuto' => '20',
+    'max_tentativas'    => '3',
+    'pausa_global'      => '0',
+] as $chave => $padrao) {
+    Db::executar(
+        'INSERT IGNORE INTO parametros (chave, valor) VALUES (?, ?)',
+        [$chave, $padrao]
+    );
+}
+
 if ($somenteTabelas) {
     echo "Estrutura do banco conferida.\n";
     exit(0);

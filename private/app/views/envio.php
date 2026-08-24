@@ -74,11 +74,25 @@ $pct = static fn(int $n) => round($n * 100 / $total, 2);
     </div>
 
     <?php if ($emCurso): ?>
-        <p class="ajuda" style="margin:16px 0 0">
-            A fila é processada em segundo plano, a até
-            <strong><?= e(parametro('envios_por_minuto', '20')) ?></strong> mensagens por minuto.
-            Você pode fechar esta página — o envio continua.
-        </p>
+        <?php $sobraDia = limiteDiario() === 0 ? null : restanteNaJanela(); ?>
+        <?php if ($sobraDia !== null && $sobraDia === 0): ?>
+            <p class="ajuda" style="margin:16px 0 0">
+                <strong>Aguardando o teto diário.</strong> O limite de
+                <?= number_format(limiteDiario(), 0, ',', '.') ?> mensagens em 24 horas foi atingido.
+                Os <?= $pendentes ?> pendentes saem a partir de
+                <?= e(date('d/m/Y H:i', strtotime((string) proximaVaga()))) ?>, sem precisar de
+                nenhuma ação sua.
+            </p>
+        <?php else: ?>
+            <p class="ajuda" style="margin:16px 0 0">
+                A fila é processada em segundo plano, a até
+                <strong><?= e(parametro('envios_por_minuto', '20')) ?></strong> por minuto<?php
+                if ($sobraDia !== null): ?>, com
+                <strong><?= number_format($sobraDia, 0, ',', '.') ?></strong> ainda disponíveis
+                nas próximas 24 horas<?php endif; ?>.
+                Você pode fechar esta página — o envio continua.
+            </p>
+        <?php endif; ?>
     <?php endif; ?>
 
     <div class="acoes" style="margin-top:18px">

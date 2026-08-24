@@ -24,6 +24,11 @@ class Db
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES   => false,
         ]);
+
+        // Alinha o fuso da sessão ao da aplicação. Sem isso, um banco em UTC
+        // grava NOW() três horas à frente do horário local, e toda data exibida
+        // ao operador — envio, próxima vaga, auditoria — sai deslocada.
+        self::$pdo->exec("SET time_zone = '" . date('P') . "'");
     }
 
     public static function pdo(): PDO

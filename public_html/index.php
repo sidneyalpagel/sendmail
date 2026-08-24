@@ -157,10 +157,13 @@ if ($metodo === 'POST') {
                     (int) $_POST['envios_por_minuto']
                 ));
                 definirParametro('envios_por_minuto', (string) $porMinuto);
+                definirParametro('envios_por_dia', (string) max(0, min(100000, (int) $_POST['envios_por_dia'])));
                 definirParametro('max_tentativas', (string) max(1, min(5, (int) $_POST['max_tentativas'])));
                 definirParametro('pausa_global', empty($_POST['pausa_global']) ? '0' : '1');
                 Auditoria::registrar('ajustes_alterados', 'parametros', null,
-                    'por_minuto=' . $porMinuto . ' pausa=' . (empty($_POST['pausa_global']) ? 'não' : 'sim'));
+                    'por_dia=' . (int) $_POST['envios_por_dia']
+                    . ' por_minuto=' . $porMinuto
+                    . ' pausa=' . (empty($_POST['pausa_global']) ? 'não' : 'sim'));
                 aviso('Ajustes salvos.');
                 irPara('?p=ajustes');
 

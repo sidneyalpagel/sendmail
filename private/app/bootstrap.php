@@ -195,3 +195,47 @@ function incluirView(string $__tela, array $__variaveis = []): void
     extract($__variaveis, EXTR_SKIP);
     require APP . '/views/layout.php';
 }
+
+/**
+ * Teto de mensagens nas últimas 24 horas.
+ *
+ * A janela é rolante, não o dia do calendário: o que saiu ontem às 15h deixa
+ * de contar hoje às 15h. Evita o efeito de meia-noite, em que a fila estoura
+ * o teto todo de uma vez assim que a data vira.
+ */
+function limiteDiario(): int
+{
+    return max(0, (int) parametro('envios_por_dia', '1000'));
+}
+
+function enviadosNaJanela(): int
+{
+    return (int) Db::valor(
+        'SELECT COUNT(*) FROM fila
+          WHERE status = "enviado" AND enviado_em >= DATE_SUB(NOW(), INTERVAL 24 HOUR)'
+    );
+}
+
+/** Quanto ainda cabe hoje. PHP_INT_MAX quando o limite está desligado (0). */
+function restanteNaJanela(): int
+{
+    $limite = limiteDiario();
+    if ($limite === 0) {
+        return PHP_INT_MAX;
+    }
+    return max(0, $limite - enviadosNaJanela());
+}
+
+/** Quando a janela libera a próxima vaga. */
+function proximaVaga(): ?string
+{
+    $limite = limiteDiario();
+    if ($limite === 0) {
+        return null;
+    }
+    return Db::valor(
+        'SELECT DATE_ADD(enviado_em, INTERVAL 24 HOUR) FROM fila
+          WHERE status = "enviado" AND enviado_em >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+          ORDER BY enviado_em ASC LIMIT 1'
+    );
+}

@@ -6,18 +6,61 @@
     </div>
 </div>
 
+<?php
+$limiteDia  = limiteDiario();
+$usadoHoje  = enviadosNaJanela();
+$sobraHoje  = $limiteDia === 0 ? null : max(0, $limiteDia - $usadoHoje);
+?>
+
+<div class="cartao" style="max-width:720px">
+    <h2>Consumo das últimas 24 horas</h2>
+    <p class="ajuda">
+        A janela é rolante: cada mensagem deixa de contar 24 horas depois de sair.
+    </p>
+    <div class="grade grade--2">
+        <div class="numero">
+            <div class="numero__valor"><?= number_format($usadoHoje, 0, ',', '.') ?></div>
+            <div class="numero__rotulo">Enviadas na janela</div>
+        </div>
+        <div class="numero">
+            <div class="numero__valor"><?= $sobraHoje === null ? '∞' : number_format($sobraHoje, 0, ',', '.') ?></div>
+            <div class="numero__rotulo">Ainda cabem hoje</div>
+        </div>
+    </div>
+    <?php if ($sobraHoje === 0): ?>
+        <p class="ajuda" style="margin:14px 0 0">
+            O teto foi atingido. A fila retoma sozinha conforme a janela desliza — a próxima vaga
+            abre em <?= e(date('d/m/Y H:i', strtotime((string) proximaVaga()))) ?>.
+        </p>
+    <?php endif; ?>
+</div>
+
 <div class="cartao" style="max-width:720px">
     <h2>Cadência da fila</h2>
     <p class="ajuda">
-        O servidor de e-mail da Prefeitura aplica cota por remetente. Se a cadência for alta demais,
-        as mensagens começam a ser recusadas no meio da campanha. O teto absoluto definido no
-        arquivo de configuração é de <?= (int) config('fila.limite_por_minuto', 60) ?> por minuto.
+        Dois limites atuam ao mesmo tempo. O <strong>diário</strong> protege a reputação do domínio
+        — provedores como Gmail e Outlook avaliam volume e taxa de reclamação. O
+        <strong>por minuto</strong> evita estourar a cota por remetente do servidor de e-mail
+        num pico. O teto absoluto por minuto, definido no arquivo de configuração, é de
+        <?= (int) config('fila.limite_por_minuto', 60) ?>.
     </p>
 
     <form method="post">
         <input type="hidden" name="csrf" value="<?= token() ?>">
         <input type="hidden" name="acao" value="ajustes_salvar">
         <input type="hidden" name="voltar" value="?p=ajustes">
+
+        <div class="campo">
+            <label for="envios_por_dia">Mensagens por dia</label>
+            <input type="number" id="envios_por_dia" name="envios_por_dia" min="0" max="100000"
+                   value="<?= e(parametro('envios_por_dia', '1000')) ?>">
+            <span class="dica">
+                Teto nas últimas 24 horas. Ao atingi-lo, a fila pausa e retoma sozinha —
+                nenhuma mensagem é perdida. Use <strong>0</strong> para desligar o limite.
+                Se o domínio ainda não envia volume, comece baixo (50 a 100) e suba ao longo
+                de duas ou três semanas.
+            </span>
+        </div>
 
         <div class="linha-campos">
             <div class="campo">

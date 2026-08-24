@@ -19,8 +19,9 @@ Domínio de produção: `https://sendmail.santahelena.pr.gov.br`
   `{{bairro}}`, `{{data}}` e outras) substituídas no momento do envio.
 - **Fila com worker próprio**: o disparo não depende do navegador aberto nem do
   tempo limite do PHP. A tela de acompanhamento mostra o andamento em tempo real.
-- **Cadência configurável** e pausa global, para não estourar a cota de envio do
-  servidor de e-mail.
+- **Teto diário** em janela rolante de 24 horas, protegendo a reputação do
+  domínio, mais **cadência por minuto** e pausa global, para não estourar a
+  cota do servidor de e-mail.
 - **Retentativa automática** de endereços que falharam por motivo temporário,
   com desistência após um número definido de tentativas.
 - **Descadastro em um clique**, pelo rodapé da mensagem ou pelo próprio cliente
@@ -102,10 +103,14 @@ E o agendamento do worker:
 
 ## Cuidados de operação
 
-**Cota do servidor de e-mail.** Servidores corporativos costumam limitar
-mensagens por remetente por período. Se a cadência for alta demais, as recusas
-começam no meio da campanha. Ajuste "mensagens por minuto" em *Ajustes* e
-garanta que a conta remetente tenha tratamento adequado na política de cota.
+**Dois limites, propósitos diferentes.** O teto diário protege a reputação do
+domínio junto aos provedores, que avaliam volume e taxa de reclamação. O limite
+por minuto evita estourar a cota por remetente do servidor de e-mail num pico.
+Os dois ficam em *Ajustes*.
+
+**Aquecimento.** Se o domínio ainda não envia volume, começar com mil mensagens
+no primeiro dia é um salto que os provedores notam. O usual é partir de 50 a 100
+e subir ao longo de duas ou três semanas, acompanhando a taxa de rejeição.
 
 **A conta remetente não é a conta de resposta.** O campo `Reply-To` aponta para
 o endereço de atendimento, para que respostas cheguem a quem pode respondê-las.

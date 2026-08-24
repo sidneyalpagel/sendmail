@@ -26,6 +26,26 @@
     </div>
 </div>
 
+<?php $sobra = limiteDiario() === 0 ? null : restanteNaJanela(); ?>
+<div class="grade grade--2" style="margin-bottom:22px">
+    <div class="numero">
+        <div class="numero__valor"><?= number_format(enviadosNaJanela(), 0, ',', '.') ?></div>
+        <div class="numero__rotulo">Enviadas em 24h</div>
+    </div>
+    <div class="numero">
+        <div class="numero__valor"><?= $sobra === null ? '∞' : number_format($sobra, 0, ',', '.') ?></div>
+        <div class="numero__rotulo">Ainda cabem hoje</div>
+    </div>
+</div>
+
+<?php if ($sobra !== null && $sobra === 0): ?>
+    <div class="aviso aviso--erro">
+        O teto de <?= number_format(limiteDiario(), 0, ',', '.') ?> mensagens em 24 horas foi
+        atingido. A fila continua parada até <?= e(date('d/m/Y H:i', strtotime((string) proximaVaga()))) ?>,
+        quando a janela abre a próxima vaga. Nada foi perdido — os envios pendentes retomam sozinhos.
+    </div>
+<?php endif; ?>
+
 <?php if (parametro('pausa_global', '0') === '1'): ?>
     <div class="aviso aviso--erro">
         A fila está pausada globalmente. Nenhuma mensagem sai enquanto isso durar — reative em Ajustes.

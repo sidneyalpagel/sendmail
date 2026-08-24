@@ -55,6 +55,19 @@ try {
             break;
         }
 
+        // Teto das últimas 24 horas. Recalculado a cada volta: a janela é
+        // rolante e outros ciclos podem ter enviado nesse meio-tempo.
+        if (restanteNaJanela() <= 0) {
+            if ($processados === 0) {
+                $vaga = proximaVaga();
+                registrar(
+                    'teto diário atingido (' . limiteDiario() . ' em 24h)'
+                    . ($vaga ? '; próxima vaga em ' . $vaga : '')
+                );
+            }
+            break;
+        }
+
         $item = proximoItem();
         if (!$item) {
             break; // fila vazia
