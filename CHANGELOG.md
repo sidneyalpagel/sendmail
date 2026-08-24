@@ -1,5 +1,19 @@
 # Histórico de versões
 
+## 1.2.0 — 24/08/2026
+
+Descadastro público.
+
+- Novo componente `descadastro-publico/`: página autônoma de cancelamento, para
+  hospedar em domínio alcançável pela internet. Sem sessão, sem login, sem
+  acesso a campanhas ou operadores — valida o token assinado e marca o contato.
+- Atende o One-Click da RFC 8058, o botão "cancelar inscrição" do Gmail e do
+  Outlook.
+- Usuário de banco próprio e restrito por coluna: lê quatro campos de
+  `contatos`, escreve em dois, e só acrescenta em `auditoria`.
+- Nova opção `app.url_descadastro`, separada de `app.url_base`: o painel segue
+  na rede interna e apenas o link do rodapé aponta para fora.
+
 ## 1.1.0 — 24/08/2026
 
 Teto diário de envio.

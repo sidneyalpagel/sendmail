@@ -157,7 +157,11 @@ function tokenDescadastro(int $contatoId): string
 
 function linkDescadastro(int $contatoId): string
 {
-    return rtrim((string) config('app.url_base'), '/')
+    $base = trim((string) config('app.url_descadastro', ''));
+    if ($base === '') {
+        $base = (string) config('app.url_base');
+    }
+    return rtrim($base, '/')
         . '/descadastro.php?c=' . $contatoId . '&t=' . tokenDescadastro($contatoId);
 }
 

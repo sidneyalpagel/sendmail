@@ -25,7 +25,8 @@ Domínio de produção: `https://sendmail.santahelena.pr.gov.br`
 - **Retentativa automática** de endereços que falharam por motivo temporário,
   com desistência após um número definido de tentativas.
 - **Descadastro em um clique**, pelo rodapé da mensagem ou pelo próprio cliente
-  de e-mail (cabeçalho `List-Unsubscribe`). Quem se descadastra fica fora de
+  de e-mail (cabeçalho `List-Unsubscribe`), servido por um componente público
+  independente do painel. Quem se descadastra fica fora de
   qualquer envio seguinte, inclusive dos que já estavam na fila.
 - **Trilha de auditoria** de tudo que os operadores fazem.
 
@@ -68,6 +69,8 @@ private/              Fora do alcance do navegador
     worker.php        Processa a fila (cron)
   lib/                PHPMailer embutido
   logs/
+
+descadastro-publico/  Página pública de cancelamento (domínio separado)
 
 sql/schema.sql        Estrutura do banco
 ```

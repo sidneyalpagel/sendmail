@@ -50,6 +50,17 @@ return [
         'orgao'     => 'Prefeitura Municipal de Santa Helena',
         'url_base'  => 'https://sendmail.santahelena.pr.gov.br',
 
+        // Endereço PÚBLICO da página de descadastro. É ele que vai no rodapé
+        // das mensagens e no cabeçalho List-Unsubscribe.
+        //
+        // O painel roda na rede interna, mas o cidadão abre o e-mail em casa,
+        // no celular. Se o link não resolver de fora, a única saída que resta
+        // a ele é o botão "denunciar spam" — que é justamente o que derruba a
+        // reputação do domínio.
+        //
+        // Deixe vazio APENAS se o painel já for alcançável pela internet.
+        'url_descadastro' => 'https://comunica.santahelena.pr.gov.br',
+
         // Usada para assinar os links de descadastro. Gere uma vez e NUNCA mude:
         //   php -r "echo bin2hex(random_bytes(32));"
         'chave'     => 'GERE_UMA_CHAVE_ALEATORIA_AQUI',
