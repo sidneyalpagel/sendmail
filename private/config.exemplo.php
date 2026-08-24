@@ -23,6 +23,8 @@ return [
     // Servidor de saída (Zimbra da Prefeitura, com autenticação)
     // ---------------------------------------------------------------
     'smtp' => [
+        // O host pode ser trocado pela interface (Ajustes → Servidor de saída);
+        // este valor vale enquanto o parâmetro smtp_host estiver vazio.
         'host'      => 'zldapmta.santahelena.pr.gov.br',
         'porta'     => 587,
         'seguranca' => 'tls',   // 'tls' (STARTTLS, porta 587) | 'ssl' (porta 465) | '' (sem criptografia)

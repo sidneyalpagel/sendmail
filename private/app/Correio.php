@@ -25,7 +25,9 @@ class Correio
     {
         $m = $this->mailer;
         $m->isSMTP();
-        $m->Host        = (string) config('smtp.host');
+        // O host é ajustável pela interface (parâmetro smtp_host); vazio
+        // significa usar o do config.php. Os demais dados ficam no arquivo.
+        $m->Host        = parametro('smtp_host', '') ?: (string) config('smtp.host');
         $m->Port        = (int) config('smtp.porta', 587);
         $m->SMTPAuth    = true;
         $m->Username    = (string) config('smtp.usuario');
@@ -116,7 +118,7 @@ class Correio
         $smtp = new SMTP();
         $smtp->do_debug = SMTP::DEBUG_OFF;
 
-        $host      = (string) config('smtp.host');
+        $host      = parametro('smtp_host', '') ?: (string) config('smtp.host');
         $porta     = (int) config('smtp.porta', 587);
         $seguranca = (string) config('smtp.seguranca', 'tls');
         $prefixo   = $seguranca === 'ssl' ? 'ssl://' : '';

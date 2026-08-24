@@ -174,6 +174,20 @@ if ($metodo === 'POST') {
                 aviso('Ajustes salvos.');
                 irPara('?p=ajustes');
 
+            case 'smtp_salvar':
+                Auth::exigirAdmin();
+                $host = trim((string) ($_POST['smtp_host'] ?? ''));
+                if ($host !== '' && !preg_match('/^[a-z0-9][a-z0-9.-]*$/i', $host)) {
+                    throw new RuntimeException('Informe apenas o nome do servidor, sem barras nem espaços — por exemplo: zldapmta.santahelena.pr.gov.br');
+                }
+                definirParametro('smtp_host', $host);
+                Auditoria::registrar('smtp_alterado', 'parametros', null,
+                    $host !== '' ? 'host=' . $host : 'voltou ao host do config.php');
+                aviso($host !== ''
+                    ? 'Servidor SMTP alterado para ' . $host . '. Use o teste de conexão para confirmar.'
+                    : 'Servidor SMTP voltou ao definido em config.php.');
+                irPara('?p=ajustes');
+
             case 'testar_smtp':
                 Auth::exigirAdmin();
                 [$ok, $detalhe] = (new Correio(false))->testarConexao();

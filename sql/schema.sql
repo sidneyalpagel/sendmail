@@ -110,4 +110,5 @@ INSERT IGNORE INTO parametros (chave, valor) VALUES
     ('envios_por_dia',    '1000'),
     ('envios_por_minuto', '20'),
     ('max_tentativas',    '3'),
-    ('pausa_global',      '0');
+    ('pausa_global',      '0'),
+    ('smtp_host',         'zldapmta.santahelena.pr.gov.br');

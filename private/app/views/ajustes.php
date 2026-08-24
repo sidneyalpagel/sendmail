@@ -94,19 +94,34 @@ $sobraHoje  = $limiteDia === 0 ? null : max(0, $limiteDia - $usadoHoje);
 
 <div class="cartao" style="max-width:720px">
     <h2>Servidor de saída</h2>
+
+    <form method="post">
+        <input type="hidden" name="csrf" value="<?= token() ?>">
+        <input type="hidden" name="acao" value="smtp_salvar">
+        <input type="hidden" name="voltar" value="?p=ajustes">
+        <div class="campo">
+            <label for="smtp_host">Servidor SMTP</label>
+            <input type="text" id="smtp_host" name="smtp_host"
+                   value="<?= e(parametro('smtp_host', '') ?: (string) config('smtp.host')) ?>">
+            <span class="dica">
+                A porta (<?= (int) config('smtp.porta') ?>) e as credenciais ficam em
+                <span class="dado">private/config.php</span>. Deixe vazio para voltar ao
+                servidor definido no arquivo. Depois de trocar, use o teste abaixo.
+            </span>
+        </div>
+        <button class="botao" style="margin-bottom:18px">Salvar servidor</button>
+    </form>
+
     <table class="tabela">
         <tbody>
-        <tr><td style="width:180px">Servidor</td><td class="dado"><?= e((string) config('smtp.host')) ?>:<?= (int) config('smtp.porta') ?></td></tr>
+        <tr><td style="width:180px">Em uso</td><td class="dado"><?= e(parametro('smtp_host', '') ?: (string) config('smtp.host')) ?>:<?= (int) config('smtp.porta') ?></td></tr>
         <tr><td>Criptografia</td><td class="dado"><?= e(strtoupper((string) config('smtp.seguranca')) ?: 'nenhuma') ?></td></tr>
         <tr><td>Conta autenticada</td><td class="dado"><?= e((string) config('smtp.usuario')) ?></td></tr>
         <tr><td>Remetente exibido</td><td class="dado"><?= e((string) config('smtp.remetente_email')) ?></td></tr>
         <tr><td>Respostas vão para</td><td class="dado"><?= e((string) config('smtp.responder_para_email')) ?></td></tr>
         </tbody>
     </table>
-    <p class="ajuda" style="margin-top:14px">
-        Esses valores ficam em <span class="dado">private/config.php</span> e só mudam pelo servidor.
-    </p>
-    <form method="post">
+    <form method="post" style="margin-top:14px">
         <input type="hidden" name="csrf" value="<?= token() ?>">
         <input type="hidden" name="acao" value="testar_smtp">
         <input type="hidden" name="voltar" value="?p=ajustes">

@@ -1,5 +1,16 @@
 # Histórico de versões
 
+## 1.3.4 — 24/08/2026
+
+Servidor SMTP ajustável.
+
+- O host do servidor de saída passa a ser editável em *Ajustes → Servidor de
+  saída*, pré-definido como `zldapmta.santahelena.pr.gov.br` (o MTA do
+  Zimbra). Vazio, vale o host do `config.php`. Porta, criptografia e
+  credenciais continuam apenas no arquivo.
+- A troca fica na auditoria (`smtp_alterado`) e o botão de teste de conexão
+  usa o host em vigor.
+
 ## 1.3.3 — 24/08/2026
 
 Correção.
