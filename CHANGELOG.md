@@ -1,5 +1,20 @@
 # Histórico de versões
 
+## 1.2.3 — 24/08/2026
+
+Correções no deploy.
+
+- O `rsync --delete` da publicação não apaga mais os diretórios que o
+  HestiaCP mantém na raiz do domínio (`logs/`, `stats/`, `document_errors/`,
+  `cgi-bin/`, `public_shtml/`). Antes, um deploy os removia e o painel de
+  hospedagem perdia logs e estatísticas do domínio.
+- `--voltar` restaura somente `public_html` e `private` (o que o backup
+  guarda), em vez de aplicar `--delete` na raiz do destino — o que apagava
+  `sql/`, a documentação e os mesmos diretórios do painel.
+- `--voltar` agora toma a trava do worker antes de trocar os arquivos, como a
+  publicação já fazia.
+- `.gitattributes` fora da publicação, como os demais arquivos de controle.
+
 ## 1.2.2 — 24/08/2026
 
 Publicação no GitHub.

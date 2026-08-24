@@ -95,10 +95,19 @@ if [[ $VOLTAR -eq 1 ]]; then
     read -r -p "  Confirma? [s/N] " resposta
     [[ "$resposta" =~ ^[sS]$ ]] || { nota "cancelado"; exit 0; }
 
+    # Mesma trava da publicação: não trocar arquivos no meio de um envio.
+    TRAVA="${DESTINO}/private/logs/worker.lock"
+    mkdir -p "$(dirname "$TRAVA")"
+    exec 9>"$TRAVA"
+    flock -w 90 9 || abortar "o worker não liberou a trava em 90s; tente de novo daqui a pouco"
+
+    # Restaura apenas o que o backup guarda (public_html e private), sem
+    # --delete na raiz do destino: lá vivem também os diretórios do painel
+    # de hospedagem (logs/, stats/, cgi-bin/...), que não são nossos.
     rsync -a --delete \
         --exclude 'private/config.php' \
         --exclude 'private/logs/' \
-        "${BACKUPS}/${ULTIMO}/" "${DESTINO}/"
+        "${BACKUPS}/${ULTIMO}/public_html" "${BACKUPS}/${ULTIMO}/private" "${DESTINO}/"
     chown -R "${USUARIO}:${GRUPO}" "${DESTINO}/public_html" "${DESTINO}/private"
     ok "restaurado"
     anotar "RESTAURADO a partir de ${ULTIMO}"
@@ -206,6 +215,7 @@ EXCLUIR=(
     --exclude '.git/'
     --exclude '.github/'
     --exclude '.gitignore'
+    --exclude '.gitattributes'
     --exclude '.editorconfig'
     --exclude 'private/config.php'
     --exclude 'private/logs/'
@@ -214,6 +224,14 @@ EXCLUIR=(
     # em pedaços enquanto executa, e sobrescrevê-lo em pleno rsync faria a
     # execução continuar em um arquivo diferente do que começou.
     --exclude 'deploy/'
+    # Diretórios que o painel de hospedagem (HestiaCP) mantém na raiz do
+    # domínio. Não vêm do repositório e o --delete não pode levá-los.
+    # As barras iniciais ancoram na raiz: private/logs/ não é afetado.
+    --exclude '/logs/'
+    --exclude '/stats/'
+    --exclude '/document_errors/'
+    --exclude '/cgi-bin/'
+    --exclude '/public_shtml/'
 )
 
 rsync -a --delete --itemize-changes --dry-run "${EXCLUIR[@]}" \
