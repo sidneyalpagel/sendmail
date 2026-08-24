@@ -175,10 +175,22 @@ class Contatos
      */
     public static function importarCsv(string $caminho, string $separador = ';', bool $atualizar = true): array
     {
-        $ponteiro = fopen($caminho, 'r');
-        if (!$ponteiro) {
+        $conteudo = file_get_contents($caminho);
+        if ($conteudo === false) {
             throw new RuntimeException('Não foi possível ler o arquivo enviado.');
         }
+
+        // Exportações de sistemas Windows costumam vir em ANSI (Windows-1252),
+        // não em UTF-8. Sem converter, cabeçalhos acentuados ("Nome Razão")
+        // não são reconhecidos e os acentos dos dados viram lixo no banco.
+        if (!mb_check_encoding($conteudo, 'UTF-8')) {
+            $conteudo = mb_convert_encoding($conteudo, 'UTF-8', 'Windows-1252');
+        }
+
+        $ponteiro = fopen('php://temp', 'r+');
+        fwrite($ponteiro, $conteudo);
+        rewind($ponteiro);
+        unset($conteudo);
 
         $cabecalho = fgetcsv($ponteiro, 0, $separador);
         if (!$cabecalho) {
