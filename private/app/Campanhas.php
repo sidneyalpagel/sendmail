@@ -271,7 +271,34 @@ class Campanhas
             $sql .= ' AND status = ?';
             $par[] = $situacao;
         }
-        return Db::todos($sql . ' ORDER BY id LIMIT ' . max(1, $limite), $par);
+        $sql .= ' ORDER BY id';
+        if ($limite > 0) {
+            $sql .= ' LIMIT ' . $limite;
+        }
+        return Db::todos($sql, $par);
+    }
+
+    /**
+     * Campanhas já liberadas (tudo menos rascunho), para o relatório.
+     * Datas no formato AAAA-MM-DD, filtrando pela liberação do envio.
+     */
+    public static function relatorio(string $de = '', string $ate = '', string $status = ''): array
+    {
+        $sql = 'SELECT * FROM campanhas WHERE status <> "rascunho"';
+        $par = [];
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $de)) {
+            $sql .= ' AND iniciado_em >= ?';
+            $par[] = $de . ' 00:00:00';
+        }
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $ate)) {
+            $sql .= ' AND iniciado_em <= ?';
+            $par[] = $ate . ' 23:59:59';
+        }
+        if (in_array($status, ['na_fila', 'enviando', 'pausada', 'concluida', 'cancelada'], true)) {
+            $sql .= ' AND status = ?';
+            $par[] = $status;
+        }
+        return Db::todos($sql . ' ORDER BY iniciado_em DESC, id DESC', $par);
     }
 
     public static function descricaoEscopo(array $campanha): string

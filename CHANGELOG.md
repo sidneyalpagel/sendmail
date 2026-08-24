@@ -1,5 +1,18 @@
 # Histórico de versões
 
+## 1.7.0 — 24/08/2026
+
+Relatórios.
+
+- Nova tela *Relatórios*: todas as campanhas liberadas, com filtro por
+  período (data de liberação) e situação, duração de cada envio, contagens,
+  taxa de entrega e resumo do período.
+- Exportação em CSV (compatível com Excel): o resumo do período e, por
+  campanha, a lista completa de destinatários com situação, tentativas,
+  data de envio e o detalhe da falha quando houver — disponível também no
+  botão "Baixar relatório" da tela do envio.
+- Downloads de relatório ficam registrados na auditoria.
+
 ## 1.6.0 — 24/08/2026
 
 Formatação, bairros e limite de anexos.

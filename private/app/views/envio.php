@@ -113,6 +113,7 @@ $pct = static fn(int $n) => round($n * 100 / $total, 2);
 
     <div class="acoes" style="margin-top:18px">
         <a href="?p=previa&amp;id=<?= $id ?>" target="_blank" rel="noopener" class="botao botao--neutro botao--pequeno">Ver a mensagem</a>
+        <a href="?p=envio_csv&amp;id=<?= $id ?>" class="botao botao--neutro botao--pequeno">Baixar relatório (CSV)</a>
 
         <form method="post">
             <input type="hidden" name="csrf" value="<?= token() ?>">

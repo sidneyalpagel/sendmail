@@ -9,6 +9,7 @@ $navegacao = [
     'contatos' => ['Contatos',    ['contatos', 'contato', 'importar']],
     'bairros'  => ['Bairros',     ['bairros']],
     'modelos'  => ['Modelos',     ['modelos', 'modelo']],
+    'relatorio'=> ['Relatórios',  ['relatorio']],
     'auditoria'=> ['Auditoria',   ['auditoria']],
 ];
 if (Auth::eAdmin()) {

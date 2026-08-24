@@ -420,6 +420,73 @@ switch ($pagina) {
         ], JSON_UNESCAPED_UNICODE);
         exit;
 
+    case 'relatorio':
+        $de     = (string) ($_GET['de'] ?? '');
+        $ate    = (string) ($_GET['ate'] ?? '');
+        $status = (string) ($_GET['status'] ?? '');
+        $linhas = Campanhas::relatorio($de, $ate, $status);
+        incluirView('relatorio', compact('linhas', 'de', 'ate', 'status'));
+        break;
+
+    case 'relatorio_csv':
+        $linhas = Campanhas::relatorio(
+            (string) ($_GET['de'] ?? ''),
+            (string) ($_GET['ate'] ?? ''),
+            (string) ($_GET['status'] ?? '')
+        );
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="relatorio-envios.csv"');
+        $saida = fopen('php://output', 'w');
+        fwrite($saida, "\xEF\xBB\xBF"); // BOM: Excel abre UTF-8 corretamente
+        fputcsv($saida, ['Envio', 'Público', 'Situação', 'Liberado em', 'Concluído em',
+                         'Total', 'Entregues', 'Falhas', 'Suprimidos', 'Taxa de entrega'], ';');
+        foreach ($linhas as $c) {
+            fputcsv($saida, [
+                $c['nome'],
+                Campanhas::descricaoEscopo($c),
+                $c['status'],
+                $c['iniciado_em'] ? date('d/m/Y H:i', strtotime($c['iniciado_em'])) : '',
+                $c['concluido_em'] ? date('d/m/Y H:i', strtotime($c['concluido_em'])) : '',
+                (int) $c['total'],
+                (int) $c['enviados'],
+                (int) $c['falhas'],
+                (int) $c['suprimidos'],
+                (int) $c['total'] > 0
+                    ? number_format((int) $c['enviados'] * 100 / (int) $c['total'], 1, ',', '') . '%'
+                    : '',
+            ], ';');
+        }
+        fclose($saida);
+        Auditoria::registrar('relatorio_baixado', 'campanha', null, 'resumo do período');
+        exit;
+
+    case 'envio_csv':
+        $id = (int) ($_GET['id'] ?? 0);
+        $campanha = Campanhas::buscar($id);
+        if (!$campanha) {
+            http_response_code(404);
+            exit('Envio não encontrado.');
+        }
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="envio-' . $id . '.csv"');
+        $saida = fopen('php://output', 'w');
+        fwrite($saida, "\xEF\xBB\xBF");
+        fputcsv($saida, ['Nome', 'E-mail', 'Bairro', 'Situação', 'Tentativas', 'Enviado em', 'Detalhe'], ';');
+        foreach (Campanhas::itensFila($id, '', 0) as $item) {
+            fputcsv($saida, [
+                $item['nome'],
+                $item['email'],
+                $item['bairro'],
+                $item['status'],
+                (int) $item['tentativas'],
+                $item['enviado_em'] ? date('d/m/Y H:i', strtotime($item['enviado_em'])) : '',
+                $item['ultimo_erro'],
+            ], ';');
+        }
+        fclose($saida);
+        Auditoria::registrar('relatorio_baixado', 'campanha', (string) $id, $campanha['nome']);
+        exit;
+
     case 'ajustes':
         Auth::exigirAdmin();
         $operadores = Db::todos('SELECT * FROM operadores ORDER BY nome');
