@@ -28,7 +28,7 @@ return [
         'host'      => 'zldapmta.santahelena.pr.gov.br',
         'porta'     => 587,
         'seguranca' => 'tls',   // 'tls' (STARTTLS, porta 587) | 'ssl' (porta 465) | '' (sem criptografia)
-        'usuario'   => 'naoresponda@santahelena.pr.gov.br',
+        'usuario'   => 'naoresponda@comunica.santahelena.pr.gov.br',
         'senha'     => 'TROQUE_ESTA_SENHA',
 
         // Verificação do certificado do servidor. Deixe true.
@@ -36,7 +36,7 @@ return [
         'verificar_certificado' => true,
 
         // Remetente exibido ao destinatário
-        'remetente_email' => 'naoresponda@santahelena.pr.gov.br',
+        'remetente_email' => 'naoresponda@comunica.santahelena.pr.gov.br',
         'remetente_nome'  => 'Prefeitura de Santa Helena - TIC',
 
         // Para onde vão as respostas (não pode ser a conta de disparo)
