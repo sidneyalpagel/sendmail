@@ -1,5 +1,16 @@
 # Histórico de versões
 
+## 1.3.1 — 24/08/2026
+
+Importação.
+
+- O importador de CSV aceita exportações de outros sistemas: cabeçalhos como
+  "Pessoas - Nome Razão", "Pessoas - CPF/CNPJ" e "Bairro - Nome" são
+  reconhecidos, e quando nenhuma coluna se chama "email" o endereço é
+  localizado pelo próprio conteúdo do arquivo. Se mais de uma coluna se
+  parecer com e-mail, a importação para com uma mensagem que explica o que
+  fazer, em vez de adivinhar.
+
 ## 1.3.0 — 24/08/2026
 
 Robustez.
