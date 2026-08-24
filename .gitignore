@@ -1,0 +1,17 @@
+# Configuração com credenciais — nunca versionar
+private/config.php
+
+# Logs e travas do worker
+private/logs/*
+!private/logs/.gitkeep
+
+# Arquivos temporários de importação
+private/tmp/
+
+# Sistema operacional / editores
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
