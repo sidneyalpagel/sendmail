@@ -195,10 +195,15 @@ azul "4. Diferenças"
 EXCLUIR=(
     --exclude '.git/'
     --exclude '.github/'
-    --exclude 'deploy/'
+    --exclude '.gitignore'
+    --exclude '.editorconfig'
     --exclude 'private/config.php'
     --exclude 'private/logs/'
     --exclude '*.md'
+    # O próprio deploy vive fora do diretório publicado: o bash lê o script
+    # em pedaços enquanto executa, e sobrescrevê-lo em pleno rsync faria a
+    # execução continuar em um arquivo diferente do que começou.
+    --exclude 'deploy/'
 )
 
 rsync -a --delete --itemize-changes --dry-run "${EXCLUIR[@]}" \
@@ -294,6 +299,13 @@ if crontab -u "$USUARIO" -l 2>/dev/null | grep -q 'worker.php'; then
 else
     erro "o worker NÃO está no cron do usuário ${USUARIO} — a fila não vai andar"
     nota "veja a seção 10 do INSTALL.md"
+fi
+
+# O deploy.sh não é publicado junto; avisa quando a versão do repositório mudou.
+if ! cmp -s "${ESPELHO}/deploy/deploy.sh" "${AQUI}/deploy.sh" 2>/dev/null; then
+    erro "o deploy.sh do repositório está diferente deste"
+    nota "atualize com:  cp ${ESPELHO}/deploy/deploy.sh ${AQUI}/deploy.sh"
+    nota "e confira se o deploy.conf.exemplo ganhou opções novas"
 fi
 
 anotar "PUBLICADO ${REFERENCIA} (${COMMIT}) — ${DESCRICAO}"

@@ -63,10 +63,19 @@ normal e indica sucesso.
 
 ### 4. Preparar o script
 
+O script mora **fora** do diretório publicado. É de propósito: o bash lê o
+arquivo em pedaços enquanto executa, e o `rsync` sobrescrevendo o próprio
+`deploy.sh` no meio da publicação faria a execução continuar em outro arquivo.
+
 ```bash
 mkdir -p /opt/sendmail-deploy
-cd /home/informatica/web/sendmail.santahelena.pr.gov.br/deploy
-cp deploy.conf.exemplo deploy.conf
+cd /opt/sendmail-deploy
+
+# Do pacote de instalação, ou do clone do repositório:
+cp /caminho/do/repositorio/deploy/deploy.sh .
+cp /caminho/do/repositorio/deploy/deploy.conf.exemplo deploy.conf
+
+chmod +x deploy.sh
 chmod 600 deploy.conf
 nano deploy.conf
 ```
@@ -74,9 +83,8 @@ nano deploy.conf
 Ajuste `REPO`, `REFERENCIA`, `DESTINO` e `USUARIO`. O `deploy.conf` não guarda
 segredo nenhum — só caminhos e o endereço do repositório.
 
-```bash
-chmod +x deploy.sh
-```
+Quando uma versão nova alterar o próprio `deploy.sh`, o script avisa ao final e
+mostra o comando para se atualizar.
 
 > O primeiro deploy pressupõe a aplicação já instalada pelo `INSTALL.md`: o
 > script se recusa a rodar sem um `private/config.php` no destino, justamente
@@ -87,7 +95,7 @@ chmod +x deploy.sh
 ## Publicando
 
 ```bash
-cd /home/informatica/web/sendmail.santahelena.pr.gov.br/deploy
+cd /opt/sendmail-deploy
 
 ./deploy.sh --simular          # mostra o que mudaria, sem tocar em nada
 ./deploy.sh                    # publica a REFERENCIA do deploy.conf
@@ -146,6 +154,7 @@ git push && git push origin v1.1.0
 E no servidor:
 
 ```bash
+cd /opt/sendmail-deploy
 ./deploy.sh --simular v1.1.0
 ./deploy.sh v1.1.0
 ```
