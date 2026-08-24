@@ -1,5 +1,18 @@
 # Histórico de versões
 
+## 1.3.2 — 24/08/2026
+
+Correção.
+
+- A importação de CSV grava em lotes dentro de uma transação, em vez de
+  consultar o banco quatro vezes por linha. Com o banco em outra máquina,
+  arquivos com milhares de linhas estouravam os 60 segundos do PHP e a
+  importação parava pela metade (Gateway Timeout). Um arquivo de 20 mil
+  linhas agora resolve em segundos.
+- E-mail repetido dentro do próprio arquivo é fundido (vale a última linha),
+  e a auditoria registra o resumo da importação, não mais um evento por
+  contato criado.
+
 ## 1.3.1 — 24/08/2026
 
 Importação.
