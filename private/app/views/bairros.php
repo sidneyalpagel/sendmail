@@ -52,6 +52,9 @@
                                    style="width:180px">
                             <button class="botao botao--neutro botao--pequeno">Renomear</button>
                         </form>
+                        <a href="?p=bairro_fundir&amp;id=<?= (int) $b['id'] ?>"
+                           class="botao botao--neutro botao--pequeno"
+                           title="Move os contatos para outro bairro; este deixa de existir">Fundir</a>
                         <form method="post"
                               <?php if ((int) $b['contatos'] === 0): ?>
                                   onsubmit="return confirm('Excluir o bairro <?= e($b['nome']) ?>?')"

@@ -62,8 +62,10 @@ class Bairros
     /**
      * Renomeia um bairro e propaga aos contatos. Se o nome novo já existir
      * no catálogo, os dois são fundidos.
+     *
+     * @return int contatos atualizados
      */
-    public static function renomear(int $id, string $novoNome): void
+    public static function renomear(int $id, string $novoNome): int
     {
         $bairro = Db::primeiro('SELECT * FROM bairros WHERE id = ?', [$id]);
         if (!$bairro) {
@@ -74,7 +76,7 @@ class Bairros
             throw new RuntimeException('Informe o novo nome do bairro.');
         }
         if ($novo === $bairro['nome']) {
-            return;
+            return 0;
         }
 
         $duplicado = Db::primeiro('SELECT id FROM bairros WHERE nome = ? AND id <> ?', [$novo, $id]);
@@ -98,6 +100,26 @@ class Bairros
             (string) $id,
             $bairro['nome'] . ' → ' . $novo . " ({$afetados} contatos)"
         );
+        return $afetados;
+    }
+
+    /**
+     * Funde este bairro em outro já cadastrado: os contatos migram para o
+     * destino e o bairro de origem deixa de existir.
+     *
+     * @return int contatos atualizados
+     */
+    public static function fundir(int $id, int $destinoId): int
+    {
+        if ($destinoId === $id) {
+            throw new RuntimeException('Escolha um bairro de destino diferente do atual.');
+        }
+        $destino = self::buscar($destinoId);
+        if (!$destino) {
+            throw new RuntimeException('Bairro de destino não encontrado.');
+        }
+        // Renomear para um nome que já existe é exatamente a fusão.
+        return self::renomear($id, $destino['nome']);
     }
 
     public static function buscar(int $id): ?array

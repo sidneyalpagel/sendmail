@@ -1,5 +1,14 @@
 # Histórico de versões
 
+## 1.7.3 — 24/08/2026
+
+Fusão de bairros.
+
+- Botão "Fundir" ao lado de cada bairro. Abre uma tela que pede o bairro de
+  destino e deixa explícito: o bairro atual deixa de existir e os contatos
+  dele passam automaticamente para o destino. A confirmação repete os nomes
+  e a quantidade de contatos movidos, e tudo fica na auditoria.
+
 ## 1.7.2 — 24/08/2026
 
 Exclusão de bairro com aviso detalhado.

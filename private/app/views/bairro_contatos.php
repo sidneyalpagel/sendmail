@@ -15,10 +15,11 @@
 <div class="cartao" style="max-width:720px">
     <h2>Como resolver</h2>
     <p class="ajuda">
-        <strong>Para mover todos de uma vez</strong>, renomeie o bairro abaixo — se o novo nome
-        já existir no cadastro, os dois são fundidos e os contatos vão junto. Depois disso o
-        bairro antigo deixa de existir. <strong>Para mover um por um</strong>, abra o contato
-        na lista e troque o bairro dele.
+        <strong>Para mover todos de uma vez</strong>,
+        <a href="?p=bairro_fundir&amp;id=<?= (int) $bairro['id'] ?>">funda este bairro em outro</a>
+        — os contatos vão junto e este deixa de existir — ou renomeie abaixo (novo nome já
+        cadastrado também funde). <strong>Para mover um por um</strong>, abra o contato na
+        lista e troque o bairro dele.
     </p>
     <form method="post" class="filtros"
           onsubmit="return confirm('Renomear o bairro <?= e($bairro['nome']) ?>? Os <?= count($moradores) ?> contatos dele serão atualizados.')">

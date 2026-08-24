@@ -96,6 +96,18 @@ if ($metodo === 'POST') {
                 aviso('Bairro atualizado. Os contatos dele foram ajustados.');
                 irPara('?p=bairros');
 
+            case 'bairro_fundir':
+                $id = (int) $_POST['id'];
+                $bairro  = Bairros::buscar($id);
+                $destino = Bairros::buscar((int) ($_POST['destino_id'] ?? 0));
+                if (!$bairro || !$destino) {
+                    throw new RuntimeException('Escolha o bairro de destino.');
+                }
+                $movidos = Bairros::fundir($id, (int) $destino['id']);
+                aviso("Bairro {$bairro['nome']} fundido em {$destino['nome']}: "
+                    . ($movidos === 1 ? '1 contato movido.' : "{$movidos} contatos movidos."));
+                irPara('?p=bairros');
+
             case 'bairro_excluir':
                 $id = (int) $_POST['id'];
                 $bairro = Bairros::buscar($id);
@@ -362,6 +374,25 @@ switch ($pagina) {
 
     case 'bairros':
         incluirView('bairros', ['bairros' => Bairros::listar()]);
+        break;
+
+    case 'bairro_fundir':
+        $id = (int) ($_GET['id'] ?? 0);
+        $bairro = Bairros::buscar($id);
+        if (!$bairro) {
+            aviso('Bairro não encontrado.', 'erro');
+            irPara('?p=bairros');
+        }
+        $totalMoradores = count(Bairros::contatosDoBairro($id));
+        $destinos = array_values(array_filter(
+            Bairros::listar(),
+            static fn(array $b) => (int) $b['id'] !== $id
+        ));
+        if (!$destinos) {
+            aviso('Não há outro bairro cadastrado para receber a fusão.', 'erro');
+            irPara('?p=bairros');
+        }
+        incluirView('bairro_fundir', compact('bairro', 'totalMoradores', 'destinos'));
         break;
 
     case 'bairro_contatos':
