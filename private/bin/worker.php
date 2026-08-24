@@ -44,6 +44,24 @@ if (parametro('pausa_global', '0') === '1') {
     exit(0);
 }
 
+// ---------------------------------------------------------------------
+// Recuperação de itens presos em "enviando"
+// ---------------------------------------------------------------------
+// Se um ciclo anterior morreu no meio de um envio (queda de energia, kill),
+// a linha capturada fica em "enviando" para sempre: nenhuma consulta a
+// retoma e a campanha nunca conclui. Com a trava em mãos não há outro
+// processo enviando, então é seguro recolocá-la na fila. Conta como
+// tentativa: se for a própria mensagem que derruba o processo, ela desiste
+// ao atingir o máximo em vez de repetir o estrago indefinidamente.
+$presos = Db::executar(
+    'UPDATE fila SET status = "pendente", tentativas = tentativas + 1,
+            ultimo_erro = "processo interrompido durante o envio"
+      WHERE status = "enviando"'
+)->rowCount();
+if ($presos > 0) {
+    registrar("recuperados {$presos} itens presos em \"enviando\" de um ciclo interrompido");
+}
+
 $correio    = null;
 $processados = 0;
 
