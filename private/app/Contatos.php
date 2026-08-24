@@ -196,8 +196,21 @@ class Contatos
             }
         }
         if (!isset($mapa['email'])) {
-            fclose($ponteiro);
-            throw new RuntimeException('O arquivo precisa ter uma coluna "email".');
+            // Exportações de outros sistemas nem sempre nomeiam a coluna:
+            // o endereço vem em campos genéricos ("Descrição", "Contato").
+            // Fareja uma amostra do conteúdo; se exatamente uma coluna
+            // contém e-mails, é ela.
+            $indice = self::farejarColunaEmail($ponteiro, $separador);
+            if ($indice === null) {
+                fclose($ponteiro);
+                throw new RuntimeException(
+                    'Não encontrei a coluna de e-mail. Nomeie-a "email" no cabeçalho, '
+                    . 'ou confira se o separador escolhido é o mesmo do arquivo.'
+                );
+            }
+            $mapa['email'] = $indice;
+            rewind($ponteiro);
+            fgetcsv($ponteiro, 0, $separador); // pula o cabeçalho de novo
         }
 
         $criados = $atualizados = $ignorados = 0;
@@ -266,16 +279,57 @@ class Contatos
         return compact('criados', 'atualizados', 'ignorados', 'erros');
     }
 
+    /**
+     * Descobre a coluna de e-mail pelo conteúdo, quando o cabeçalho não a
+     * nomeia. Lê uma amostra e devolve o índice da coluna em que ao menos
+     * metade dos valores preenchidos é um e-mail válido — ou null quando
+     * nenhuma (ou mais de uma) se qualifica, caso em que adivinhar é pior
+     * que pedir o cabeçalho certo.
+     *
+     * @param resource $ponteiro posicionado logo após o cabeçalho
+     */
+    private static function farejarColunaEmail($ponteiro, string $separador): ?int
+    {
+        $validos = $preenchidos = [];
+        $lidas = 0;
+        while ($lidas < 50 && ($colunas = fgetcsv($ponteiro, 0, $separador)) !== false) {
+            if (count($colunas) === 1 && trim((string) $colunas[0]) === '') {
+                continue;
+            }
+            $lidas++;
+            foreach ($colunas as $i => $valor) {
+                $valor = trim((string) $valor);
+                if ($valor === '') {
+                    continue;
+                }
+                $preenchidos[$i] = ($preenchidos[$i] ?? 0) + 1;
+                if (emailValido(mb_strtolower($valor))) {
+                    $validos[$i] = ($validos[$i] ?? 0) + 1;
+                }
+            }
+        }
+
+        $candidatas = [];
+        foreach ($validos as $i => $qtd) {
+            if ($qtd * 2 >= $preenchidos[$i]) {
+                $candidatas[] = $i;
+            }
+        }
+        return count($candidatas) === 1 ? $candidatas[0] : null;
+    }
+
     private static function chaveColuna(string $nome): ?string
     {
         $nome = mb_strtolower(trim($nome));
         $nome = strtr($nome, ['á'=>'a','à'=>'a','ã'=>'a','â'=>'a','é'=>'e','ê'=>'e','í'=>'i','ó'=>'o','ô'=>'o','õ'=>'o','ú'=>'u','ç'=>'c']);
         $equivalentes = [
-            'nome'       => ['nome', 'nome completo', 'destinatario', 'contato'],
+            'nome'       => ['nome', 'nome completo', 'destinatario', 'contato',
+                             'pessoas - nome razao', 'nome razao', 'razao social'],
             'email'      => ['email', 'e-mail', 'endereco de email', 'mail'],
-            'bairro'     => ['bairro', 'localidade', 'regiao'],
+            'bairro'     => ['bairro', 'localidade', 'regiao', 'bairro - nome'],
             'telefone'   => ['telefone', 'fone', 'celular', 'whatsapp'],
-            'documento'  => ['documento', 'cpf', 'matricula'],
+            'documento'  => ['documento', 'cpf', 'matricula', 'cpf/cnpj',
+                             'pessoas - cpf/cnpj'],
             'observacao' => ['observacao', 'obs', 'anotacao'],
         ];
         foreach ($equivalentes as $chave => $lista) {

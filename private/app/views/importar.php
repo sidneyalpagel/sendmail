@@ -68,4 +68,11 @@ João Pereira;joao.pereira@exemplo.com;São Cristóvão;(45) 98888-1111</pre>
         <span class="dado">observacao</span>. Quem já pediu descadastro continua fora dos envios
         mesmo que apareça de novo no arquivo.
     </p>
+    <p class="ajuda" style="margin-top:14px">
+        Exportações de outros sistemas também funcionam: cabeçalhos como
+        <span class="dado">Pessoas - Nome Razão</span>, <span class="dado">Bairro - Nome</span> e
+        <span class="dado">CPF/CNPJ</span> são reconhecidos, e quando nenhuma coluna se chama
+        "email" o endereço é localizado pelo próprio conteúdo. Linhas sem e-mail válido
+        (telefones, por exemplo) são apenas ignoradas.
+    </p>
 </div>
