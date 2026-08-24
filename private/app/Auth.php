@@ -6,6 +6,29 @@ declare(strict_types=1);
  */
 class Auth
 {
+    /** Proteção contra força bruta: falhas na janela que bloqueiam o login. */
+    public const BLOQUEIO_FALHAS  = 10;
+    public const BLOQUEIO_MINUTOS = 15;
+
+    /**
+     * Muitas falhas recentes vindas deste IP ou contra este login?
+     *
+     * Conta os "login_negado" da própria auditoria — sem tabela nova. A
+     * janela expira sozinha: tentativas bloqueadas geram "login_bloqueado",
+     * que não entra na conta, então o bloqueio não se renova a cada batida.
+     */
+    public static function bloqueadoTemporariamente(string $login): bool
+    {
+        $falhas = (int) Db::valor(
+            'SELECT COUNT(*) FROM auditoria
+              WHERE acao = "login_negado"
+                AND criado_em > DATE_SUB(NOW(), INTERVAL ' . self::BLOQUEIO_MINUTOS . ' MINUTE)
+                AND (ip = ? OR entidade_id = ?)',
+            [ip(), $login]
+        );
+        return $falhas >= self::BLOQUEIO_FALHAS;
+    }
+
     public static function entrar(string $login, string $senha): bool
     {
         $operador = Db::primeiro(

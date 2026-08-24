@@ -13,7 +13,14 @@ $metodo = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 if ($pagina === 'login') {
     if ($metodo === 'POST') {
         conferirToken();
-        if (Auth::entrar(trim((string) $_POST['login']), (string) $_POST['senha'])) {
+        $login = trim((string) $_POST['login']);
+        if (Auth::bloqueadoTemporariamente($login)) {
+            Auditoria::registrar('login_bloqueado', 'operador', $login);
+            aviso('Muitas tentativas seguidas. Aguarde ' . Auth::BLOQUEIO_MINUTOS
+                . ' minutos e tente novamente.', 'erro');
+            irPara('?p=login');
+        }
+        if (Auth::entrar($login, (string) $_POST['senha'])) {
             irPara('?p=painel');
         }
         aviso('Login ou senha incorretos.', 'erro');
