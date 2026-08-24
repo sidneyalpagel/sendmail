@@ -1,5 +1,22 @@
 # Histórico de versões
 
+## 1.6.0 — 24/08/2026
+
+Formatação, bairros e limite de anexos.
+
+- O texto do envio preserva a formatação digitada: linha em branco vira
+  parágrafo e quebra simples vira quebra de linha. Antes, texto sem marcação
+  HTML chegava como uma parede contínua. Quem escreve HTML próprio (`<p>`,
+  `<ul>`...) passa intacto.
+- Cadastro de bairros, na nova tela *Bairros*: cadastrar, renomear (os
+  contatos do bairro são atualizados juntos; nomes iguais são fundidos) e
+  excluir (apenas bairros sem contatos). O cadastro nasce alimentado pelos
+  bairros já presentes nos contatos, e a importação de CSV registra sozinha
+  os que ainda não existem.
+- No contato, o bairro passa a ser escolhido do cadastro, em vez de digitado
+  livre.
+- Limite de anexos por envio sobe de 10 para 20 MB.
+
 ## 1.5.1 — 24/08/2026
 
 Correção.

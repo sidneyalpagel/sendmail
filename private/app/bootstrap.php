@@ -30,7 +30,7 @@ require_once LIB . '/Exception.php';
 require_once LIB . '/PHPMailer.php';
 require_once LIB . '/SMTP.php';
 
-foreach (['Db', 'Auditoria', 'Auth', 'Contatos', 'Modelos', 'Campanhas', 'Anexos', 'Mensagem', 'Correio'] as $classe) {
+foreach (['Db', 'Auditoria', 'Auth', 'Bairros', 'Contatos', 'Modelos', 'Campanhas', 'Anexos', 'Mensagem', 'Correio'] as $classe) {
     require_once APP . '/' . $classe . '.php';
 }
 

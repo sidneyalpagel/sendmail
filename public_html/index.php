@@ -85,6 +85,22 @@ if ($metodo === 'POST') {
                 aviso("Importação concluída: {$r['criados']} novos, {$r['atualizados']} atualizados, {$r['ignorados']} ignorados.");
                 irPara('?p=importar');
 
+            // ---------------------------------------------------- bairros
+            case 'bairro_criar':
+                $nome = Bairros::criar((string) ($_POST['nome'] ?? ''));
+                aviso('Bairro ' . $nome . ' cadastrado.');
+                irPara('?p=bairros');
+
+            case 'bairro_renomear':
+                Bairros::renomear((int) $_POST['id'], (string) ($_POST['nome'] ?? ''));
+                aviso('Bairro atualizado. Os contatos dele foram ajustados.');
+                irPara('?p=bairros');
+
+            case 'bairro_excluir':
+                Bairros::excluir((int) $_POST['id']);
+                aviso('Bairro excluído.');
+                irPara('?p=bairros');
+
             // ---------------------------------------------------- modelos
             case 'modelo_salvar':
                 $id = (int) ($_POST['id'] ?? 0);
@@ -311,8 +327,12 @@ switch ($pagina) {
             aviso('Contato não encontrado.', 'erro');
             irPara('?p=contatos');
         }
-        $bairros = Contatos::bairros();
+        $bairros = Bairros::listar();
         incluirView('contato_form', compact('contato', 'bairros'));
+        break;
+
+    case 'bairros':
+        incluirView('bairros', ['bairros' => Bairros::listar()]);
         break;
 
     case 'importar':

@@ -126,6 +126,13 @@ if (!$temModeloId) {
     echo "Tabela anexos ganhou a coluna modelo_id.\n";
 }
 
+// Alimenta o cadastro de bairros com o que já existe nos contatos.
+// INSERT IGNORE: rodar de novo não duplica nada.
+Db::pdo()->exec(
+    'INSERT IGNORE INTO bairros (nome)
+     SELECT DISTINCT bairro FROM contatos WHERE bairro IS NOT NULL AND bairro <> ""'
+);
+
 foreach ([
     'envios_por_dia'    => '1000',
     'envios_por_minuto' => '20',

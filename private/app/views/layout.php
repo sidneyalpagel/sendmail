@@ -7,6 +7,7 @@ $navegacao = [
     'painel'   => ['Painel',      ['painel']],
     'envios'   => ['Envios',      ['envios', 'envio', 'envio_novo']],
     'contatos' => ['Contatos',    ['contatos', 'contato', 'importar']],
+    'bairros'  => ['Bairros',     ['bairros']],
     'modelos'  => ['Modelos',     ['modelos', 'modelo']],
     'auditoria'=> ['Auditoria',   ['auditoria']],
 ];

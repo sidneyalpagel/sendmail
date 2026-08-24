@@ -37,9 +37,29 @@ class Mensagem
         return strtr($texto, $valores);
     }
 
+    /**
+     * Preserva a formatação digitada. Texto sem marcação de bloco vira
+     * parágrafos: linha em branco separa parágrafos, quebra simples vira
+     * <br>. Quem já escreve HTML com <p>, <ul> etc. passa intacto —
+     * senão o e-mail chega como uma parede de texto, porque HTML ignora
+     * quebras de linha.
+     */
+    public static function formatar(string $html): string
+    {
+        if (preg_match('/<(p|br|div|table|ul|ol|h[1-6]|blockquote)\b/i', $html)) {
+            return $html;
+        }
+        $paragrafos = preg_split('/\R{2,}/', trim($html)) ?: [];
+        return implode("\n", array_map(
+            static fn(string $p) => '<p style="margin:0 0 1em;">' . nl2br($p, false) . '</p>',
+            $paragrafos
+        ));
+    }
+
     /** Envolve o corpo escrito pelo operador na moldura institucional. */
     public static function moldura(string $corpoHtml, array $destinatario): string
     {
+        $corpoHtml = self::formatar($corpoHtml);
         $orgao  = e((string) config('app.orgao'));
         $rodape = e((string) config('app.rodape'));
         $link   = !empty($destinatario['contato_id'])

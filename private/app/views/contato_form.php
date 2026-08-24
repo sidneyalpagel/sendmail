@@ -27,11 +27,23 @@
             </div>
             <div class="campo">
                 <label for="bairro">Bairro</label>
-                <input type="text" id="bairro" name="bairro" list="lista-bairros" value="<?= e($contato['bairro'] ?? '') ?>">
-                <datalist id="lista-bairros">
-                    <?php foreach ($bairros as $b): ?><option value="<?= e($b['bairro']) ?>"><?php endforeach; ?>
-                </datalist>
-                <span class="dica">Usado para enviar só para um bairro. A caixa é padronizada automaticamente.</span>
+                <?php
+                $bairroAtual = (string) ($contato['bairro'] ?? '');
+                $nomes = array_column($bairros, 'nome');
+                ?>
+                <select id="bairro" name="bairro">
+                    <option value="">— sem bairro —</option>
+                    <?php foreach ($nomes as $nome): ?>
+                        <option value="<?= e($nome) ?>" <?= $bairroAtual === $nome ? 'selected' : '' ?>><?= e($nome) ?></option>
+                    <?php endforeach; ?>
+                    <?php if ($bairroAtual !== '' && !in_array($bairroAtual, $nomes, true)): ?>
+                        <option value="<?= e($bairroAtual) ?>" selected><?= e($bairroAtual) ?> (fora do cadastro)</option>
+                    <?php endif; ?>
+                </select>
+                <span class="dica">
+                    Usado para enviar só para um bairro.
+                    Faltando algum? Cadastre na tela <a href="?p=bairros">Bairros</a>.
+                </span>
             </div>
         </div>
 

@@ -16,7 +16,7 @@ class Anexos
 {
     /** Soma máxima por envio ou modelo, em bytes. Mensagens maiores são
      *  recusadas por muitos provedores — e multiplicam pelo tamanho da lista. */
-    public const LIMITE_TOTAL = 10 * 1024 * 1024;
+    public const LIMITE_TOTAL = 20 * 1024 * 1024;
 
     /** Extensões aceitas: documentos e imagens, nada executável. */
     private const EXTENSOES = [

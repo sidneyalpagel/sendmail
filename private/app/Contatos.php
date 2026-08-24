@@ -105,7 +105,7 @@ class Contatos
         $campos = [
             $nome,
             $email,
-            self::normalizarBairro($dados['bairro'] ?? null),
+            Bairros::registrar($dados['bairro'] ?? null),
             trim((string) ($dados['telefone'] ?? '')) ?: null,
             trim((string) ($dados['documento'] ?? '')) ?: null,
             trim((string) ($dados['observacao'] ?? '')) ?: null,
@@ -154,17 +154,6 @@ class Contatos
     {
         Db::executar('UPDATE contatos SET opt_out = 0, opt_out_em = NULL WHERE id = ?', [$id]);
         Auditoria::registrar('recadastro', 'contato', (string) $id);
-    }
-
-    private static function normalizarBairro(?string $bairro): ?string
-    {
-        $bairro = trim((string) $bairro);
-        if ($bairro === '') {
-            return null;
-        }
-        // Colapsa espaços e padroniza a caixa para não criar "Centro" e "CENTRO".
-        $bairro = preg_replace('/\s+/u', ' ', $bairro);
-        return mb_convert_case(mb_strtolower($bairro, 'UTF-8'), MB_CASE_TITLE, 'UTF-8');
     }
 
     /**
@@ -257,7 +246,7 @@ class Contatos
             $lidos[$email] = [
                 'nome'       => $pegar('nome') ?: $email,
                 'email'      => $email,
-                'bairro'     => self::normalizarBairro($pegar('bairro')),
+                'bairro'     => Bairros::normalizar($pegar('bairro')),
                 'telefone'   => $pegar('telefone') ?: null,
                 'documento'  => $pegar('documento') ?: null,
                 'observacao' => $pegar('observacao') ?: null,
@@ -317,6 +306,16 @@ class Contatos
                 );
             }
         });
+
+        // Bairros novos do arquivo entram no cadastro automaticamente.
+        $nomesBairros = array_values(array_unique(array_filter(array_column($gravar, 'bairro'))));
+        if ($nomesBairros) {
+            Db::executar(
+                'INSERT IGNORE INTO bairros (nome) VALUES '
+                . rtrim(str_repeat('(?),', count($nomesBairros)), ','),
+                $nomesBairros
+            );
+        }
 
         Auditoria::registrar(
             'importacao_csv',
