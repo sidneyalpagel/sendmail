@@ -1,5 +1,16 @@
 # Histórico de versões
 
+## 1.2.2 — 24/08/2026
+
+Publicação no GitHub.
+
+- O repositório agora vive em <https://github.com/sidneyalpagel/sendmail>,
+  público. O deploy passa a buscar direto de lá por HTTPS, sem credencial —
+  o bundle em `/tmp` deixa de ser necessário.
+- `.gitattributes` garante fim de linha LF nos scripts shell: um checkout no
+  Windows entregava o `deploy.sh` com CRLF, que quebra o bash no servidor.
+- `deploy.conf.exemplo` atualizado com o endereço real do repositório.
+
 ## 1.2.1 — 24/08/2026
 
 Correção.
