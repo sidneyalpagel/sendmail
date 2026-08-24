@@ -27,7 +27,12 @@ function perguntar(string $rotulo, bool $oculto = false): string
     return trim((string) fgets(STDIN));
 }
 
-echo "== Instalação do Disparador de e-mails ==\n\n";
+// Modo usado pelo deploy: cria o que faltar e sai, sem perguntar nada.
+$somenteTabelas = in_array('--tabelas', $argv, true);
+
+if (!$somenteTabelas) {
+    echo "== Instalação do Disparador de e-mails ==\n\n";
+}
 
 // ---------------------------------------------------------------------
 // 1. Estrutura do banco
@@ -68,7 +73,7 @@ foreach (['operadores', 'contatos', 'modelos', 'campanhas', 'fila', 'auditoria',
 // ---------------------------------------------------------------------
 // 2. Chave da aplicação
 // ---------------------------------------------------------------------
-if (str_contains((string) config('app.chave'), 'GERE_UMA_CHAVE')) {
+if (!$somenteTabelas && str_contains((string) config('app.chave'), 'GERE_UMA_CHAVE')) {
     echo "\nATENÇÃO: a chave da aplicação ainda é o valor de exemplo.\n";
     echo "Gere uma e coloque em config.php na opção app.chave:\n\n";
     echo '  ' . bin2hex(random_bytes(32)) . "\n\n";
@@ -78,6 +83,11 @@ if (str_contains((string) config('app.chave'), 'GERE_UMA_CHAVE')) {
 // ---------------------------------------------------------------------
 // 3. Primeiro operador
 // ---------------------------------------------------------------------
+if ($somenteTabelas) {
+    echo "Estrutura do banco conferida.\n";
+    exit(0);
+}
+
 $existentes = (int) Db::valor('SELECT COUNT(*) FROM operadores');
 if ($existentes > 0) {
     echo "\nJá existem {$existentes} operadores cadastrados. Nada mais a fazer.\n";

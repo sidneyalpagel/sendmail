@@ -1,0 +1,32 @@
+# Configuração do deploy — copie para deploy.conf e ajuste.
+#
+#   cp deploy.conf.exemplo deploy.conf
+#   chmod 600 deploy.conf
+#
+# Este arquivo NÃO guarda segredo nenhum. A autenticação com o GitHub é feita
+# pela chave de deploy em ~/.ssh/, que nunca sai do servidor.
+
+# Repositório, sempre por SSH (não use https:// com token embutido na URL)
+REPO="git@github.com:SEU_USUARIO/sendmail.git"
+
+# O que publicar: um branch (main) ou uma tag (v1.0.0).
+# Em produção, prefira tag — assim você sabe exatamente o que está no ar.
+REFERENCIA="v1.0.0"
+
+# Onde a aplicação roda
+DESTINO="/home/informatica/web/sendmail.santahelena.pr.gov.br"
+USUARIO="informatica"
+GRUPO="informatica"
+
+# Área de trabalho do deploy (cópia do repositório e backups)
+TRABALHO="/opt/sendmail-deploy"
+
+# Quantos backups manter
+MANTER_BACKUPS=5
+
+# Caminho do PHP
+PHP="/usr/bin/php"
+
+# Apelido da chave de deploy configurada em ~/.ssh/config
+# (deixe vazio para usar a configuração padrão do SSH)
+HOST_SSH="github-sendmail"
