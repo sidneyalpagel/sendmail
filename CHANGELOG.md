@@ -1,5 +1,18 @@
 # Histórico de versões
 
+## 1.3.3 — 24/08/2026
+
+Correção.
+
+- A importação converte arquivos ANSI (Windows-1252) para UTF-8 antes de ler.
+  Exportações de sistemas Windows vinham nessa codificação: o cabeçalho
+  "Pessoas - Nome Razão" não era reconhecido por causa do acento e todos os
+  contatos entravam com o e-mail no lugar do nome; acentos nos dados também
+  chegavam corrompidos ao banco. Reimportar o mesmo arquivo com "Atualizar"
+  marcado corrige os nomes de quem já entrou.
+- `config.exemplo.php`: o servidor SMTP correto é `zldapmta.santahelena.pr.gov.br`
+  (MTA), não `zimbramailbox1` (mailbox).
+
 ## 1.3.2 — 24/08/2026
 
 Correção.

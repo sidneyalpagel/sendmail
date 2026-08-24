@@ -23,7 +23,7 @@ return [
     // Servidor de saída (Zimbra da Prefeitura, com autenticação)
     // ---------------------------------------------------------------
     'smtp' => [
-        'host'      => 'zimbramailbox1.santahelena.pr.gov.br',
+        'host'      => 'zldapmta.santahelena.pr.gov.br',
         'porta'     => 587,
         'seguranca' => 'tls',   // 'tls' (STARTTLS, porta 587) | 'ssl' (porta 465) | '' (sem criptografia)
         'usuario'   => 'naoresponda@santahelena.pr.gov.br',
