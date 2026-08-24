@@ -1,5 +1,14 @@
 # Histórico de versões
 
+## 1.5.1 — 24/08/2026
+
+Correção.
+
+- Ao escolher um modelo num envio novo, a tela passa a mostrar na hora quais
+  anexos ele vai trazer ("entram ao salvar o rascunho"). Antes a cópia já
+  acontecia, mas só aparecia depois de salvar — parecia que o anexo tinha se
+  perdido.
+
 ## 1.5.0 — 24/08/2026
 
 Reaproveitamento de envios.

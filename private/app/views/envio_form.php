@@ -77,6 +77,7 @@ $valor  = $campanha['escopo_valor'] ?? '';
                         <option value="<?= (int) $m['id'] ?>"
                                 data-assunto="<?= e($m['assunto']) ?>"
                                 data-corpo="<?= e($m['corpo']) ?>"
+                                data-anexos="<?= e(implode(', ', $anexosDeModelos[(int) $m['id']] ?? [])) ?>"
                                 <?= (int) ($campanha['modelo_id'] ?? 0) === (int) $m['id'] ? 'selected' : '' ?>>
                             <?= e($m['nome']) ?>
                         </option>
@@ -123,6 +124,10 @@ $valor  = $campanha['escopo_valor'] ?? '';
         </div>
         <?php endif; ?>
 
+        <?php if (!$ed): ?>
+            <p class="ajuda" id="anexos_do_modelo" style="display:none;margin:0 0 14px"></p>
+        <?php endif; ?>
+
         <div class="campo">
             <label for="anexos">Adicionar arquivos</label>
             <input type="file" id="anexos" name="anexos[]" multiple
@@ -155,6 +160,22 @@ $valor  = $campanha['escopo_valor'] ?? '';
             corpo.value   = opcao.dataset.corpo || '';
         }
     });
+
+    // Mostra os anexos que o modelo escolhido vai trazer para o envio.
+    // A cópia em si acontece ao salvar o rascunho.
+    var avisoAnexos = document.getElementById('anexos_do_modelo');
+    function mostrarAnexosDoModelo() {
+        if (!avisoAnexos) { return; }
+        var opcao = seletor.options[seletor.selectedIndex];
+        var lista = (opcao && opcao.value) ? (opcao.dataset.anexos || '') : '';
+        avisoAnexos.style.display = lista ? '' : 'none';
+        if (lista) {
+            avisoAnexos.innerHTML = '<strong>Anexos do modelo</strong> — entram neste envio ao salvar o rascunho: ';
+            avisoAnexos.appendChild(document.createTextNode(lista));
+        }
+    }
+    seletor.addEventListener('change', mostrarAnexosDoModelo);
+    mostrarAnexosDoModelo();
 
     // Marca o escopo correspondente quando o operador mexe no campo.
     document.getElementById('busca_contato').addEventListener('input', function () {

@@ -343,7 +343,13 @@ switch ($pagina) {
         $bairros  = Contatos::bairros();
         $totalGeral = Campanhas::contarPublico('todos', null);
         $anexos = $campanha ? Anexos::listar((int) $campanha['id']) : [];
-        incluirView('envio_form', compact('campanha', 'modelos', 'bairros', 'totalGeral', 'anexos'));
+        // Para a tela avisar quais anexos cada modelo traria ao envio.
+        $anexosDeModelos = [];
+        foreach (Db::todos('SELECT modelo_id, nome, tamanho FROM anexos WHERE modelo_id IS NOT NULL ORDER BY id') as $a) {
+            $anexosDeModelos[(int) $a['modelo_id']][] =
+                $a['nome'] . ' (' . Anexos::legivel((int) $a['tamanho']) . ')';
+        }
+        incluirView('envio_form', compact('campanha', 'modelos', 'bairros', 'totalGeral', 'anexos', 'anexosDeModelos'));
         break;
 
     case 'envio':
