@@ -213,9 +213,17 @@ class Contatos
             fgetcsv($ponteiro, 0, $separador); // pula o cabeçalho de novo
         }
 
-        $criados = $atualizados = $ignorados = 0;
+        // -------------------------------------------------------------
+        // 1ª fase: lê e valida o arquivo inteiro em memória.
+        //
+        // Nada de consulta por linha: com o banco em outra máquina, a
+        // latência de rede multiplicada por milhares de linhas estourava
+        // o tempo da requisição e deixava importações pela metade.
+        // -------------------------------------------------------------
+        $ignorados = 0;
         $erros = [];
         $linha = 1;
+        $lidos = [];   // email => dados; e-mail repetido no arquivo: vale a última linha
 
         while (($colunas = fgetcsv($ponteiro, 0, $separador)) !== false) {
             $linha++;
@@ -225,7 +233,6 @@ class Contatos
 
             $pegar = static fn(string $c) => isset($mapa[$c]) ? trim((string) ($colunas[$mapa[$c]] ?? '')) : '';
             $email = mb_strtolower($pegar('email'));
-            $nome  = $pegar('nome') ?: $email;
 
             if (!emailValido($email)) {
                 $ignorados++;
@@ -235,39 +242,69 @@ class Contatos
                 continue;
             }
 
-            $dados = [
-                'nome'       => $nome,
+            $lidos[$email] = [
+                'nome'       => $pegar('nome') ?: $email,
                 'email'      => $email,
-                'bairro'     => $pegar('bairro'),
-                'telefone'   => $pegar('telefone'),
-                'documento'  => $pegar('documento'),
-                'observacao' => $pegar('observacao'),
-                'ativo'      => 1,
-                'origem'     => 'csv',
+                'bairro'     => self::normalizarBairro($pegar('bairro')),
+                'telefone'   => $pegar('telefone') ?: null,
+                'documento'  => $pegar('documento') ?: null,
+                'observacao' => $pegar('observacao') ?: null,
             ];
-
-            $existente = self::porEmail($email);
-            try {
-                if ($existente) {
-                    if (!$atualizar) {
-                        $ignorados++;
-                        continue;
-                    }
-                    // Preserva o descadastro: quem pediu para sair não volta por importação.
-                    self::salvar($dados, (int) $existente['id']);
-                    $atualizados++;
-                } else {
-                    self::salvar($dados);
-                    $criados++;
-                }
-            } catch (Throwable $erro) {
-                $ignorados++;
-                if (count($erros) < 20) {
-                    $erros[] = "linha {$linha}: " . $erro->getMessage();
-                }
-            }
         }
         fclose($ponteiro);
+
+        // -------------------------------------------------------------
+        // 2ª fase: uma única consulta separa novos de já cadastrados.
+        // -------------------------------------------------------------
+        $existentes = [];
+        foreach (Db::todos('SELECT email FROM contatos') as $l) {
+            $existentes[$l['email']] = true;
+        }
+
+        $criados = $atualizados = 0;
+        $gravar = [];
+        foreach ($lidos as $email => $dados) {
+            if (isset($existentes[$email])) {
+                if (!$atualizar) {
+                    $ignorados++;
+                    continue;
+                }
+                $atualizados++;
+            } else {
+                $criados++;
+            }
+            $gravar[] = $dados;
+        }
+
+        // -------------------------------------------------------------
+        // 3ª fase: grava em lotes, dentro de uma transação.
+        //
+        // O ON DUPLICATE cobre criação e atualização de uma vez. Ele não
+        // toca opt_out nem origem: quem pediu descadastro continua fora
+        // dos envios mesmo aparecendo de novo no arquivo.
+        // -------------------------------------------------------------
+        Db::transacao(static function () use ($gravar) {
+            foreach (array_chunk($gravar, 500) as $lote) {
+                $marcadores = rtrim(str_repeat('(?,?,?,?,?,?,1,\'csv\'),', count($lote)), ',');
+                $par = [];
+                foreach ($lote as $d) {
+                    array_push(
+                        $par,
+                        $d['nome'], $d['email'], $d['bairro'],
+                        $d['telefone'], $d['documento'], $d['observacao']
+                    );
+                }
+                Db::executar(
+                    'INSERT INTO contatos (nome, email, bairro, telefone, documento, observacao, ativo, origem)
+                     VALUES ' . $marcadores . '
+                     ON DUPLICATE KEY UPDATE
+                         nome = VALUES(nome), bairro = VALUES(bairro),
+                         telefone = VALUES(telefone), documento = VALUES(documento),
+                         observacao = VALUES(observacao), ativo = VALUES(ativo)',
+                    $par
+                );
+            }
+        });
 
         Auditoria::registrar(
             'importacao_csv',
