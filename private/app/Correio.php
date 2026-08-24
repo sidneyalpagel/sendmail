@@ -67,19 +67,24 @@ class Correio
      * Envia uma mensagem já renderizada.
      *
      * @param array $destinatario ['nome','email','bairro','contato_id']
+     * @param array $anexos linhas da tabela anexos a incluir na mensagem
      * @return string Message-ID atribuído
      * @throws RuntimeException em caso de falha
      */
-    public function enviar(array $destinatario, string $assunto, string $corpoHtml): string
+    public function enviar(array $destinatario, string $assunto, string $corpoHtml, array $anexos = []): string
     {
         $m = $this->mailer;
         $m->clearAddresses();
         $m->clearCustomHeaders();
+        $m->clearAttachments();
 
         try {
             $m->addAddress($destinatario['email'], $destinatario['nome'] ?? '');
+            foreach ($anexos as $anexo) {
+                $m->addAttachment(Anexos::caminho($anexo), $anexo['nome']);
+            }
         } catch (PHPMailerException $erro) {
-            throw new RuntimeException('Endereço recusado: ' . $erro->getMessage());
+            throw new RuntimeException('Endereço ou anexo recusado: ' . $erro->getMessage());
         }
 
         $assuntoFinal = Mensagem::preencher($assunto, $destinatario);

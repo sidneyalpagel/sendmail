@@ -107,6 +107,7 @@ if [[ $VOLTAR -eq 1 ]]; then
     rsync -a --delete \
         --exclude 'private/config.php' \
         --exclude 'private/logs/' \
+        --exclude 'private/anexos/' \
         "${BACKUPS}/${ULTIMO}/public_html" "${BACKUPS}/${ULTIMO}/private" "${DESTINO}/"
     chown -R "${USUARIO}:${GRUPO}" "${DESTINO}/public_html" "${DESTINO}/private"
     ok "restaurado"
@@ -219,6 +220,7 @@ EXCLUIR=(
     --exclude '.editorconfig'
     --exclude 'private/config.php'
     --exclude 'private/logs/'
+    --exclude 'private/anexos/'
     --exclude '*.md'
     # O próprio deploy vive fora do diretório publicado: o bash lê o script
     # em pedaços enquanto executa, e sobrescrevê-lo em pleno rsync faria a

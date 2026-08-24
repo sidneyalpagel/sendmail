@@ -1,5 +1,18 @@
 # Histórico de versões
 
+## 1.4.0 — 24/08/2026
+
+Anexos.
+
+- Os envios aceitam anexos: documentos (PDF, Office, ODF, CSV, TXT) e imagens,
+  até 10 MB somados por campanha, adicionados no rascunho e enviados em todas
+  as mensagens — inclusive no teste para si mesmo.
+- Os arquivos ficam em `private/anexos/`, fora do alcance do navegador,
+  preservados pelo deploy como config.php e logs. Excluir a campanha apaga os
+  arquivos junto; adição e remoção ficam na auditoria.
+- Nova tabela `anexos`, criada automaticamente pelo deploy em bases
+  existentes.
+
 ## 1.3.4 — 24/08/2026
 
 Servidor SMTP ajustável.

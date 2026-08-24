@@ -101,6 +101,22 @@ if ($metodo === 'POST') {
             case 'envio_salvar':
                 $id = (int) ($_POST['id'] ?? 0);
                 $novo = Campanhas::salvarRascunho($_POST, $id ?: null);
+                foreach ((array) ($_POST['remover_anexo'] ?? []) as $anexoId) {
+                    Anexos::remover((int) $anexoId, $novo);
+                }
+                if (!empty($_FILES['anexos']['name'][0])) {
+                    foreach ((array) $_FILES['anexos']['name'] as $i => $nomeArquivo) {
+                        if (($_FILES['anexos']['error'][$i] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+                            continue;
+                        }
+                        Anexos::adicionar($novo, [
+                            'name'     => $nomeArquivo,
+                            'tmp_name' => $_FILES['anexos']['tmp_name'][$i] ?? '',
+                            'size'     => $_FILES['anexos']['size'][$i] ?? 0,
+                            'error'    => $_FILES['anexos']['error'][$i] ?? UPLOAD_ERR_NO_FILE,
+                        ]);
+                    }
+                }
                 aviso('Rascunho salvo. Confira o público e a prévia antes de liberar o envio.');
                 irPara('?p=envio&id=' . $novo);
 
@@ -150,7 +166,8 @@ if ($metodo === 'POST') {
                 $correio->enviar(
                     ['nome' => Auth::nome(), 'email' => $para, 'bairro' => 'Centro', 'contato_id' => null],
                     '[TESTE] ' . $campanha['assunto'],
-                    $campanha['corpo']
+                    $campanha['corpo'],
+                    Anexos::listar((int) $campanha['id'])
                 );
                 Auditoria::registrar('envio_teste', 'campanha', (string) $campanha['id'], $para);
                 aviso('Mensagem de teste enviada para ' . $para . '.');
@@ -285,7 +302,8 @@ switch ($pagina) {
         $modelos  = Modelos::listar(true);
         $bairros  = Contatos::bairros();
         $totalGeral = Campanhas::contarPublico('todos', null);
-        incluirView('envio_form', compact('campanha', 'modelos', 'bairros', 'totalGeral'));
+        $anexos = $campanha ? Anexos::listar((int) $campanha['id']) : [];
+        incluirView('envio_form', compact('campanha', 'modelos', 'bairros', 'totalGeral', 'anexos'));
         break;
 
     case 'envio':
@@ -301,7 +319,8 @@ switch ($pagina) {
         $previsto = $campanha['status'] === 'rascunho'
             ? Campanhas::contarPublico($campanha['escopo'], $campanha['escopo_valor'])
             : (int) $campanha['total'];
-        incluirView('envio', compact('campanha', 'numeros', 'itens', 'situacao', 'previsto'));
+        $anexos = Anexos::listar($id);
+        incluirView('envio', compact('campanha', 'numeros', 'itens', 'situacao', 'previsto', 'anexos'));
         break;
 
     case 'previa':

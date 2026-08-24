@@ -13,7 +13,7 @@ $valor  = $campanha['escopo_valor'] ?? '';
     <a href="?p=envios" class="botao botao--neutro">Voltar</a>
 </div>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf" value="<?= token() ?>">
     <input type="hidden" name="acao" value="envio_salvar">
     <input type="hidden" name="voltar" value="?p=envio_novo<?= $ed ? '&id=' . (int) $campanha['id'] : '' ?>">
@@ -98,6 +98,39 @@ $valor  = $campanha['escopo_valor'] ?? '';
                 <?php foreach (array_keys(Mensagem::VARIAVEIS) as $v): ?>
                     <span class="dado"><?= e($v) ?></span>&nbsp;
                 <?php endforeach; ?>
+            </span>
+        </div>
+
+    </div>
+
+    <div class="cartao">
+        <h2>3. Anexos (opcional)</h2>
+
+        <?php if (!empty($anexos)): ?>
+        <div class="rolagem" style="margin-bottom:14px">
+            <table class="tabela">
+                <thead><tr><th>Arquivo</th><th>Tamanho</th><th>Remover</th></tr></thead>
+                <tbody>
+                <?php foreach ($anexos as $a): ?>
+                    <tr>
+                        <td><?= e($a['nome']) ?></td>
+                        <td class="dado"><?= e(Anexos::legivel((int) $a['tamanho'])) ?></td>
+                        <td><input type="checkbox" name="remover_anexo[]" value="<?= (int) $a['id'] ?>"></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php endif; ?>
+
+        <div class="campo">
+            <label for="anexos">Adicionar arquivos</label>
+            <input type="file" id="anexos" name="anexos[]" multiple
+                   accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.csv,.txt">
+            <span class="dica">
+                Documentos e imagens, até <?= e(Anexos::legivel(Anexos::LIMITE_TOTAL)) ?> somados por envio —
+                seguem em todas as mensagens desta campanha. Para remover um anexo já
+                enviado, marque "Remover" e salve.
             </span>
         </div>
 

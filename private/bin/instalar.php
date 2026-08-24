@@ -73,7 +73,7 @@ foreach (array_filter(array_map('trim', explode(';', $semComentarios))) as $coma
 }
 echo "pronto ({$criadas} comandos).\n";
 
-foreach (['operadores', 'contatos', 'modelos', 'campanhas', 'fila', 'auditoria', 'parametros'] as $tabela) {
+foreach (['operadores', 'contatos', 'modelos', 'campanhas', 'fila', 'anexos', 'auditoria', 'parametros'] as $tabela) {
     $existe = Db::valor(
         'SELECT COUNT(*) FROM information_schema.tables
           WHERE table_schema = DATABASE() AND table_name = ?',

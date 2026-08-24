@@ -200,6 +200,7 @@ class Campanhas
         if ($campanha && in_array($campanha['status'], ['na_fila', 'enviando'], true)) {
             throw new RuntimeException('Cancele o envio antes de excluí-lo.');
         }
+        Anexos::removerTodos($id);
         Db::executar('DELETE FROM campanhas WHERE id = ?', [$id]);
         Auditoria::registrar('campanha_excluida', 'campanha', (string) $id);
     }

@@ -129,6 +129,16 @@ exit(0);
 // Funções do worker
 // =====================================================================
 
+/** Anexos por campanha, lidos uma vez por ciclo. */
+function anexosDaCampanha(int $campanhaId): array
+{
+    static $cache = [];
+    if (!isset($cache[$campanhaId])) {
+        $cache[$campanhaId] = Anexos::listar($campanhaId);
+    }
+    return $cache[$campanhaId];
+}
+
 /**
  * Retira o próximo item da fila, marcando-o como "enviando" de forma
  * atômica para que dois processos jamais peguem a mesma linha.
@@ -194,7 +204,12 @@ function entregar(Correio $correio, array $item, int $maxTentativas, int $espera
     ];
 
     try {
-        $messageId = $correio->enviar($destinatario, $item['assunto'], $item['corpo']);
+        $messageId = $correio->enviar(
+            $destinatario,
+            $item['assunto'],
+            $item['corpo'],
+            anexosDaCampanha((int) $item['campanha_id'])
+        );
         Db::executar(
             'UPDATE fila SET status = "enviado", message_id = ?, enviado_em = NOW(),
                     tentativas = tentativas + 1, ultimo_erro = NULL

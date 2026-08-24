@@ -8,6 +8,9 @@ private/logs/*
 # Arquivos temporários de importação
 private/tmp/
 
+# Anexos das campanhas — dados de produção, preservados pelo deploy
+private/anexos/
+
 # Sistema operacional / editores
 .DS_Store
 Thumbs.db

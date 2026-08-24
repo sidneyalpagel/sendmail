@@ -18,6 +18,14 @@ $pct = static fn(int $n) => round($n * 100 / $total, 2);
         <h1><?= e($campanha['nome']) ?></h1>
         <p><?= e(Campanhas::descricaoEscopo($campanha)) ?> &nbsp;·&nbsp;
            criado em <?= e(date('d/m/Y H:i', strtotime($campanha['criado_em']))) ?></p>
+        <?php if (!empty($anexos)): ?>
+            <p style="margin-top:4px">
+                Anexos:
+                <?php foreach ($anexos as $a): ?>
+                    <span class="dado"><?= e($a['nome']) ?> (<?= e(Anexos::legivel((int) $a['tamanho'])) ?>)</span>&nbsp;
+                <?php endforeach; ?>
+            </p>
+        <?php endif; ?>
     </div>
     <span class="etiqueta etq-<?= e($status) ?>" style="font-size:12px;padding:6px 12px"><?= e($status) ?></span>
 </div>

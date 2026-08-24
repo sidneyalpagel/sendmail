@@ -87,6 +87,19 @@ CREATE TABLE IF NOT EXISTS fila (
         REFERENCES campanhas(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS anexos (
+    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    campanha_id  INT UNSIGNED  NOT NULL,
+    nome         VARCHAR(190)  NOT NULL,   -- nome original, exibido ao destinatário
+    arquivo      VARCHAR(255)  NOT NULL,   -- caminho relativo a private/anexos/
+    mime         VARCHAR(100)  NOT NULL,
+    tamanho      INT UNSIGNED  NOT NULL,
+    criado_em    DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_anexo_campanha (campanha_id),
+    CONSTRAINT fk_anexo_campanha FOREIGN KEY (campanha_id)
+        REFERENCES campanhas(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS auditoria (
     id           BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     operador_id  INT UNSIGNED  NULL,
