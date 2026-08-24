@@ -252,12 +252,29 @@ if ($metodo === 'POST') {
                 if ($host !== '' && !preg_match('/^[a-z0-9][a-z0-9.-]*$/i', $host)) {
                     throw new RuntimeException('Informe apenas o nome do servidor, sem barras nem espaços — por exemplo: zldapmta.santahelena.pr.gov.br');
                 }
+                $usuario = trim((string) ($_POST['smtp_usuario'] ?? ''));
+                if ($usuario !== '' && preg_match('/\s/', $usuario)) {
+                    throw new RuntimeException('A conta de envio não pode conter espaços.');
+                }
                 definirParametro('smtp_host', $host);
+                definirParametro('smtp_usuario', $usuario);
+
+                // A senha nunca é exibida: em branco mantém a atual, e a
+                // opção de limpar volta a valer a do config.php.
+                $detalheSenha = 'senha mantida';
+                if (!empty($_POST['smtp_senha_limpar'])) {
+                    definirParametro('smtp_senha', '');
+                    $detalheSenha = 'senha voltou ao config.php';
+                } elseif (($_POST['smtp_senha'] ?? '') !== '') {
+                    definirParametro('smtp_senha', (string) $_POST['smtp_senha']);
+                    $detalheSenha = 'senha alterada';
+                }
+
                 Auditoria::registrar('smtp_alterado', 'parametros', null,
-                    $host !== '' ? 'host=' . $host : 'voltou ao host do config.php');
-                aviso($host !== ''
-                    ? 'Servidor SMTP alterado para ' . $host . '. Use o teste de conexão para confirmar.'
-                    : 'Servidor SMTP voltou ao definido em config.php.');
+                    'host=' . ($host ?: '(config.php)')
+                    . ' conta=' . ($usuario ?: '(config.php)')
+                    . ' | ' . $detalheSenha);
+                aviso('Configuração do servidor salva. Use o teste de conexão para confirmar.');
                 irPara('?p=ajustes');
 
             case 'testar_smtp':

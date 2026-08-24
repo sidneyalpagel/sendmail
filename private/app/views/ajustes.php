@@ -95,20 +95,47 @@ $sobraHoje  = $limiteDia === 0 ? null : max(0, $limiteDia - $usadoHoje);
 <div class="cartao" style="max-width:720px">
     <h2>Servidor de saída</h2>
 
-    <form method="post">
+    <form method="post" autocomplete="off">
         <input type="hidden" name="csrf" value="<?= token() ?>">
         <input type="hidden" name="acao" value="smtp_salvar">
         <input type="hidden" name="voltar" value="?p=ajustes">
+
+        <div class="linha-campos">
+            <div class="campo">
+                <label for="smtp_host">Servidor SMTP</label>
+                <input type="text" id="smtp_host" name="smtp_host"
+                       value="<?= e(parametro('smtp_host', '') ?: (string) config('smtp.host')) ?>">
+            </div>
+            <div class="campo">
+                <label for="smtp_usuario">Conta de envio</label>
+                <input type="text" id="smtp_usuario" name="smtp_usuario"
+                       value="<?= e(parametro('smtp_usuario', '') ?: (string) config('smtp.usuario')) ?>">
+            </div>
+        </div>
+
         <div class="campo">
-            <label for="smtp_host">Servidor SMTP</label>
-            <input type="text" id="smtp_host" name="smtp_host"
-                   value="<?= e(parametro('smtp_host', '') ?: (string) config('smtp.host')) ?>">
+            <label for="smtp_senha">Senha da conta</label>
+            <input type="password" id="smtp_senha" name="smtp_senha" autocomplete="new-password"
+                   placeholder="em branco: mantém a senha atual">
             <span class="dica">
-                A porta (<?= (int) config('smtp.porta') ?>) e as credenciais ficam em
-                <span class="dado">private/config.php</span>. Deixe vazio para voltar ao
-                servidor definido no arquivo. Depois de trocar, use o teste abaixo.
+                A senha atual nunca é exibida. Preencha apenas para trocá-la.
             </span>
         </div>
+
+        <div class="opcao">
+            <input type="checkbox" id="smtp_senha_limpar" name="smtp_senha_limpar" value="1">
+            <label for="smtp_senha_limpar">
+                Descartar a senha salva aqui e voltar a usar a do <span class="dado">config.php</span>
+            </label>
+        </div>
+
+        <span class="dica" style="display:block;margin:10px 0 12px">
+            Campos vazios voltam a valer o <span class="dado">private/config.php</span>, onde também
+            ficam a porta (<?= (int) config('smtp.porta') ?>) e o remetente. O remetente exibido
+            precisa pertencer à conta de envio — troque os dois juntos. Depois de salvar,
+            use o teste abaixo.
+        </span>
+
         <button class="botao" style="margin-bottom:18px">Salvar servidor</button>
     </form>
 
@@ -116,7 +143,7 @@ $sobraHoje  = $limiteDia === 0 ? null : max(0, $limiteDia - $usadoHoje);
         <tbody>
         <tr><td style="width:180px">Em uso</td><td class="dado"><?= e(parametro('smtp_host', '') ?: (string) config('smtp.host')) ?>:<?= (int) config('smtp.porta') ?></td></tr>
         <tr><td>Criptografia</td><td class="dado"><?= e(strtoupper((string) config('smtp.seguranca')) ?: 'nenhuma') ?></td></tr>
-        <tr><td>Conta autenticada</td><td class="dado"><?= e((string) config('smtp.usuario')) ?></td></tr>
+        <tr><td>Conta autenticada</td><td class="dado"><?= e(parametro('smtp_usuario', '') ?: (string) config('smtp.usuario')) ?><?= parametro('smtp_senha', '') !== '' ? ' · senha definida pela interface' : '' ?></td></tr>
         <tr><td>Remetente exibido</td><td class="dado"><?= e((string) config('smtp.remetente_email')) ?></td></tr>
         <tr><td>Respostas vão para</td><td class="dado"><?= e((string) config('smtp.responder_para_email')) ?></td></tr>
         </tbody>

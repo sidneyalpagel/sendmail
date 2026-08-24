@@ -25,13 +25,13 @@ class Correio
     {
         $m = $this->mailer;
         $m->isSMTP();
-        // O host é ajustável pela interface (parâmetro smtp_host); vazio
-        // significa usar o do config.php. Os demais dados ficam no arquivo.
+        // Host, conta e senha são ajustáveis pela interface (parâmetros
+        // smtp_*); vazio significa usar o valor do config.php.
         $m->Host        = parametro('smtp_host', '') ?: (string) config('smtp.host');
         $m->Port        = (int) config('smtp.porta', 587);
         $m->SMTPAuth    = true;
-        $m->Username    = (string) config('smtp.usuario');
-        $m->Password    = (string) config('smtp.senha');
+        $m->Username    = parametro('smtp_usuario', '') ?: (string) config('smtp.usuario');
+        $m->Password    = parametro('smtp_senha', '') ?: (string) config('smtp.senha');
         $m->CharSet     = PHPMailer::CHARSET_UTF8;
         $m->Encoding    = PHPMailer::ENCODING_BASE64;
         $m->Timeout     = 30;
@@ -141,7 +141,10 @@ class Correio
                 }
                 $smtp->hello(gethostname() ?: 'localhost');
             }
-            if (!$smtp->authenticate((string) config('smtp.usuario'), (string) config('smtp.senha'))) {
+            if (!$smtp->authenticate(
+                parametro('smtp_usuario', '') ?: (string) config('smtp.usuario'),
+                parametro('smtp_senha', '') ?: (string) config('smtp.senha')
+            )) {
                 return [false, 'autenticação recusada: ' . $smtp->getError()['error']];
             }
             $smtp->quit();

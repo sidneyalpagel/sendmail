@@ -1,5 +1,15 @@
 # Histórico de versões
 
+## 1.7.1 — 24/08/2026
+
+Conta de envio pela interface.
+
+- Em *Ajustes → Servidor de saída*, além do host agora também a conta e a
+  senha do SMTP podem ser trocadas pela interface. Campo vazio volta a valer
+  o `config.php`; a senha atual nunca é exibida — em branco mantém, e há a
+  opção de descartá-la e voltar à do arquivo.
+- A auditoria registra a troca sem nunca gravar a senha.
+
 ## 1.7.0 — 24/08/2026
 
 Relatórios.
