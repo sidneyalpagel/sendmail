@@ -1,5 +1,17 @@
 # Histórico de versões
 
+## 1.5.0 — 24/08/2026
+
+Reaproveitamento de envios.
+
+- Botão "Salvar como modelo" na tela do envio, em qualquer situação — de um
+  rascunho a uma campanha concluída. O modelo nasce com assunto, corpo e uma
+  cópia dos anexos do envio.
+- Modelos aceitam anexos próprios, com as mesmas regras dos envios. Todo
+  envio novo criado a partir de um modelo herda os anexos dele — cópia
+  independente: mexer no modelo depois não altera envios já criados.
+- Migração automática da tabela `anexos` no deploy (coluna `modelo_id`).
+
 ## 1.4.0 — 24/08/2026
 
 Anexos.

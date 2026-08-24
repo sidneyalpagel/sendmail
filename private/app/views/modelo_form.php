@@ -8,7 +8,7 @@
     <a href="?p=modelos" class="botao botao--neutro">Voltar</a>
 </div>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     <input type="hidden" name="csrf" value="<?= token() ?>">
     <input type="hidden" name="acao" value="modelo_salvar">
     <input type="hidden" name="voltar" value="?p=modelo<?= $ed ? '&id=' . (int) $modelo['id'] : '' ?>">
@@ -33,6 +33,34 @@
             <span class="dica">
                 Aceita HTML simples: &lt;p&gt;, &lt;strong&gt;, &lt;ul&gt;/&lt;li&gt;, &lt;a href&gt;.
                 O cabeçalho e o rodapé institucionais são acrescentados automaticamente.
+            </span>
+        </div>
+
+        <?php if (!empty($anexos)): ?>
+        <div class="rolagem" style="margin-bottom:14px">
+            <table class="tabela">
+                <thead><tr><th>Anexo</th><th>Tamanho</th><th>Remover</th></tr></thead>
+                <tbody>
+                <?php foreach ($anexos as $a): ?>
+                    <tr>
+                        <td><?= e($a['nome']) ?></td>
+                        <td class="dado"><?= e(Anexos::legivel((int) $a['tamanho'])) ?></td>
+                        <td><input type="checkbox" name="remover_anexo[]" value="<?= (int) $a['id'] ?>"></td>
+                    </tr>
+                <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <?php endif; ?>
+
+        <div class="campo">
+            <label for="anexos">Anexos do modelo</label>
+            <input type="file" id="anexos" name="anexos[]" multiple
+                   accept=".pdf,.jpg,.jpeg,.png,.gif,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.csv,.txt">
+            <span class="dica">
+                Documentos e imagens, até <?= e(Anexos::legivel(Anexos::LIMITE_TOTAL)) ?> somados.
+                Todo envio criado a partir deste modelo já nasce com estes anexos —
+                dá para removê-los ou trocar no próprio envio.
             </span>
         </div>
 

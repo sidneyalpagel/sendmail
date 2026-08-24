@@ -110,6 +110,22 @@ if (!$indice) {
     echo "Índice idx_fila_janela criado.\n";
 }
 
+$temModeloId = Db::valor(
+    'SELECT COUNT(*) FROM information_schema.columns
+      WHERE table_schema = DATABASE() AND table_name = "anexos" AND column_name = "modelo_id"'
+);
+if (!$temModeloId) {
+    Db::pdo()->exec('ALTER TABLE anexos MODIFY campanha_id INT UNSIGNED NULL');
+    Db::pdo()->exec(
+        'ALTER TABLE anexos
+            ADD COLUMN modelo_id INT UNSIGNED NULL AFTER campanha_id,
+            ADD KEY idx_anexo_modelo (modelo_id),
+            ADD CONSTRAINT fk_anexo_modelo FOREIGN KEY (modelo_id)
+                REFERENCES modelos(id) ON DELETE CASCADE'
+    );
+    echo "Tabela anexos ganhou a coluna modelo_id.\n";
+}
+
 foreach ([
     'envios_por_dia'    => '1000',
     'envios_por_minuto' => '20',

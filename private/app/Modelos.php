@@ -50,6 +50,7 @@ class Modelos
 
     public static function excluir(int $id): void
     {
+        Anexos::removerTodosDoModelo($id);
         Db::executar('DELETE FROM modelos WHERE id = ?', [$id]);
         Auditoria::registrar('modelo_excluido', 'modelo', (string) $id);
     }

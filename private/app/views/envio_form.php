@@ -130,7 +130,8 @@ $valor  = $campanha['escopo_valor'] ?? '';
             <span class="dica">
                 Documentos e imagens, até <?= e(Anexos::legivel(Anexos::LIMITE_TOTAL)) ?> somados por envio —
                 seguem em todas as mensagens desta campanha. Para remover um anexo já
-                enviado, marque "Remover" e salve.
+                enviado, marque "Remover" e salve. Um envio novo criado a partir de um
+                modelo com anexos já nasce com eles.
             </span>
         </div>
 

@@ -88,7 +88,23 @@ if ($metodo === 'POST') {
             // ---------------------------------------------------- modelos
             case 'modelo_salvar':
                 $id = (int) ($_POST['id'] ?? 0);
-                Modelos::salvar($_POST, $id ?: null);
+                $modeloId = Modelos::salvar($_POST, $id ?: null);
+                foreach ((array) ($_POST['remover_anexo'] ?? []) as $anexoId) {
+                    Anexos::removerDoModelo((int) $anexoId, $modeloId);
+                }
+                if (!empty($_FILES['anexos']['name'][0])) {
+                    foreach ((array) $_FILES['anexos']['name'] as $i => $nomeArquivo) {
+                        if (($_FILES['anexos']['error'][$i] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+                            continue;
+                        }
+                        Anexos::adicionarAoModelo($modeloId, [
+                            'name'     => $nomeArquivo,
+                            'tmp_name' => $_FILES['anexos']['tmp_name'][$i] ?? '',
+                            'size'     => $_FILES['anexos']['size'][$i] ?? 0,
+                            'error'    => $_FILES['anexos']['error'][$i] ?? UPLOAD_ERR_NO_FILE,
+                        ]);
+                    }
+                }
                 aviso($id ? 'Modelo atualizado.' : 'Modelo criado.');
                 irPara('?p=modelos');
 
@@ -101,6 +117,10 @@ if ($metodo === 'POST') {
             case 'envio_salvar':
                 $id = (int) ($_POST['id'] ?? 0);
                 $novo = Campanhas::salvarRascunho($_POST, $id ?: null);
+                // Envio novo criado a partir de um modelo herda os anexos dele.
+                if (!$id && !empty($_POST['modelo_id'])) {
+                    Anexos::copiarModeloParaCampanha((int) $_POST['modelo_id'], $novo);
+                }
                 foreach ((array) ($_POST['remover_anexo'] ?? []) as $anexoId) {
                     Anexos::remover((int) $anexoId, $novo);
                 }
@@ -152,6 +172,25 @@ if ($metodo === 'POST') {
                 Campanhas::excluir((int) $_POST['id']);
                 aviso('Envio excluído.');
                 irPara('?p=envios');
+
+            case 'envio_para_modelo':
+                $campanha = Campanhas::buscar((int) $_POST['id']);
+                if (!$campanha) {
+                    throw new RuntimeException('Envio não encontrado.');
+                }
+                $modeloId = Modelos::salvar([
+                    'nome'    => $campanha['nome'],
+                    'assunto' => $campanha['assunto'],
+                    'corpo'   => $campanha['corpo'],
+                    'ativo'   => 1,
+                ]);
+                $copiados = Anexos::copiarCampanhaParaModelo((int) $campanha['id'], $modeloId);
+                Auditoria::registrar('envio_virou_modelo', 'modelo', (string) $modeloId,
+                    'a partir do envio ' . $campanha['id']
+                    . ($copiados ? " com {$copiados} anexo(s)" : ''));
+                aviso('Modelo criado a partir deste envio'
+                    . ($copiados ? ', com os anexos' : '') . '. Ajuste o nome se quiser.');
+                irPara('?p=modelo&id=' . $modeloId);
 
             case 'envio_teste':
                 $campanha = Campanhas::buscar((int) $_POST['id']);
@@ -289,7 +328,8 @@ switch ($pagina) {
     case 'modelo':
         $id = (int) ($_GET['id'] ?? 0);
         $modelo = $id ? Modelos::buscar($id) : null;
-        incluirView('modelo_form', compact('modelo'));
+        $anexos = $modelo ? Anexos::listarDoModelo((int) $modelo['id']) : [];
+        incluirView('modelo_form', compact('modelo', 'anexos'));
         break;
 
     case 'envios':

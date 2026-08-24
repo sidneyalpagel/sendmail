@@ -52,6 +52,14 @@ $pct = static fn(int $n) => round($n * 100 / $total, 2);
             <button class="botao botao--neutro">Enviar teste para mim</button>
         </form>
 
+        <form method="post">
+            <input type="hidden" name="csrf" value="<?= token() ?>">
+            <input type="hidden" name="acao" value="envio_para_modelo">
+            <input type="hidden" name="id" value="<?= $id ?>">
+            <input type="hidden" name="voltar" value="?p=envio&amp;id=<?= $id ?>">
+            <button class="botao botao--neutro">Salvar como modelo</button>
+        </form>
+
         <form method="post" onsubmit="return confirm('Liberar o envio para <?= $previsto ?> destinatários? Não há como recolher mensagens já entregues.')">
             <input type="hidden" name="csrf" value="<?= token() ?>">
             <input type="hidden" name="acao" value="envio_liberar">
@@ -105,6 +113,14 @@ $pct = static fn(int $n) => round($n * 100 / $total, 2);
 
     <div class="acoes" style="margin-top:18px">
         <a href="?p=previa&amp;id=<?= $id ?>" target="_blank" rel="noopener" class="botao botao--neutro botao--pequeno">Ver a mensagem</a>
+
+        <form method="post">
+            <input type="hidden" name="csrf" value="<?= token() ?>">
+            <input type="hidden" name="acao" value="envio_para_modelo">
+            <input type="hidden" name="id" value="<?= $id ?>">
+            <input type="hidden" name="voltar" value="?p=envio&amp;id=<?= $id ?>">
+            <button class="botao botao--neutro botao--pequeno">Salvar como modelo</button>
+        </form>
 
         <?php if ($emCurso): ?>
             <form method="post">
