@@ -1,5 +1,19 @@
 # Histórico de versões
 
+## 1.0.1 — 24/08/2026
+
+Deploy a partir do GitHub.
+
+- `deploy/deploy.sh`: busca a referência pedida, confere a sintaxe de todo o
+  código antes de publicar, mostra as diferenças, toma a trava do worker,
+  guarda backup e permite reverter.
+- `--simular` mostra o que mudaria sem escrever nada; `--voltar` restaura o
+  backup mais recente; `--listar` mostra as versões guardadas.
+- `instalar.php --tabelas` confere a estrutura do banco sem interação, para o
+  deploy criar tabelas que uma versão nova traga.
+- O script vive fora do diretório publicado, para não ser sobrescrito durante a
+  própria execução.
+
 ## 1.0.0 — 24/08/2026
 
 Primeira versão.
