@@ -1,5 +1,14 @@
 # Histórico de versões
 
+## 1.7.4 — 28/08/2026
+
+Correção.
+
+- Na tela do envio, a aba "Entregues" mostra os envios mais recentes
+  primeiro. Antes listava os primeiros da fila, e acompanhar uma campanha
+  longa exigia rolar até o fim. "Na fila" continua na ordem de saída, com o
+  próximo no topo. O CSV segue na ordem completa da fila.
+
 ## 1.7.3 — 24/08/2026
 
 Fusão de bairros.

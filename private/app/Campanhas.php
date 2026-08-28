@@ -271,7 +271,12 @@ class Campanhas
             $sql .= ' AND status = ?';
             $par[] = $situacao;
         }
-        $sql .= ' ORDER BY id';
+        // Entregues: o envio mais recente primeiro — é o que o operador
+        // procura ao acompanhar. A fila fica na ordem de saída (o próximo
+        // no topo), e as demais listas na ordem original.
+        $sql .= $situacao === 'enviado'
+            ? ' ORDER BY enviado_em DESC, id DESC'
+            : ' ORDER BY id';
         if ($limite > 0) {
             $sql .= ' LIMIT ' . $limite;
         }
